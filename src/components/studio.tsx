@@ -5,7 +5,9 @@ import { toBn } from "@/lab/kit";
 import { icons } from "@/lab/icons";
 import { chapters, demoById, demos } from "@/lab/scenes/index";
 import type { Chapter, Demo } from "@/lib/types";
+import { cueVoice, syncVoice, unlockVoice } from "@/lab/sound";
 import { LabStage, type LabViewer } from "./lab-stage";
+import { SceneMic } from "./scene-mic";
 import { TheaterDialog } from "./theater-dialog";
 
 const catalog = demos as Demo[];
@@ -58,6 +60,7 @@ export function Studio() {
   }, [openId]);
 
   function openDemo(id: string) {
+    cueVoice(id, 0);
     setOpenId(id);
     heroRef.current?.stop();
     window.history.replaceState(null, "", `#${id}`);
@@ -66,6 +69,7 @@ export function Studio() {
   function closeDemo() {
     setOpenId(null);
     heroRef.current?.start();
+    cueVoice(featured.id, heroRef.current?.time ?? 0);
     window.history.replaceState(null, "", window.location.pathname);
   }
 
@@ -122,8 +126,24 @@ export function Studio() {
           </div>
 
           <div>
-            <div className="relative h-[420px] overflow-hidden rounded-[28px] bg-lab shadow-[0_24px_60px_rgba(20,33,28,0.18)] sm:h-[500px]">
-              <LabStage ref={heroRef} demo={featured} active={!openId} autoplay shadow={1024} />
+            <div
+              className="relative h-[420px] overflow-hidden rounded-[28px] bg-lab shadow-[0_24px_60px_rgba(20,33,28,0.18)] sm:h-[500px]"
+              onPointerDown={() => {
+                if (!openId) unlockVoice();
+              }}
+            >
+              <LabStage
+                ref={heroRef}
+                demo={featured}
+                active={!openId}
+                autoplay
+                shadow={1024}
+                onTick={(time, _duration, playing) => {
+                  if (openId) return;
+                  syncVoice(featured.id, time, playing);
+                }}
+              />
+              <SceneMic />
               <p className="pointer-events-none absolute bottom-3 left-3 z-10 rounded-full bg-black/50 px-3 py-1 text-xs text-white">
                 টেনে ঘোরাও · স্ক্রল করে কাছে আনো
               </p>

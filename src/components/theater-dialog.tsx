@@ -2,8 +2,10 @@
 
 import { useEffect, useRef, useState } from "react";
 import { formatClock } from "@/lab/kit";
+import { syncVoice, unlockVoice } from "@/lab/sound";
 import type { Demo } from "@/lib/types";
 import { LabStage, type LabViewer } from "./lab-stage";
+import { SceneMic } from "./scene-mic";
 
 type Props = {
   demo: Demo;
@@ -70,7 +72,7 @@ export function TheaterDialog({ demo, onClose, onStep }: Props) {
         className="mx-auto grid h-full min-h-0 w-full max-w-[1200px] overflow-hidden rounded-[28px] bg-paper-2 shadow-2xl lg:grid-cols-[minmax(0,1.45fr)_minmax(300px,0.78fr)]"
       >
         <div className="flex min-h-[52dvh] flex-col bg-lab lg:min-h-0">
-          <div className="relative min-h-0 flex-1">
+          <div className="relative min-h-0 flex-1" onPointerDown={() => unlockVoice()}>
             <LabStage
               ref={viewerRef}
               demo={demo}
@@ -81,8 +83,14 @@ export function TheaterDialog({ demo, onClose, onStep }: Props) {
                 if (!scrubbing.current) setTime(nextTime);
                 setPlaying(nextPlaying);
                 setError(nextError ? "এই দৃশ্য আঁকতে সমস্যা হয়েছে। অন্য প্রমাণ খুলে দেখো।" : null);
+                try {
+                  syncVoice(demo.id, nextTime, nextPlaying && !scrubbing.current);
+                } catch {
+                  /* কণ্ঠ আটকালে ছবি থেমে যাবে না */
+                }
               }}
             />
+            <SceneMic />
             <p className="pointer-events-none absolute top-3 left-3 z-10 rounded-full bg-paper-2 px-3 py-1 text-sm font-bold text-ink">
               {stepNow?.title}
             </p>
