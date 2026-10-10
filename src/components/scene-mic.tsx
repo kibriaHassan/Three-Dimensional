@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { setVoiceEnabled, subscribeVoice, voiceEnabled } from "@/lab/sound";
 
 export function SceneMic() {
-  const [on, setOn] = useState(true);
+  const [on, setOn] = useState(false);
 
   useEffect(() => {
     setOn(voiceEnabled());
@@ -15,8 +15,8 @@ export function SceneMic() {
     <button
       type="button"
       aria-pressed={on}
-      aria-label={on ? "কণ্ঠ চালু আছে। বন্ধ করতে চাপো।" : "কণ্ঠ বন্ধ আছে। চালু করতে চাপো।"}
-      title={on ? "কণ্ঠ বন্ধ" : "কণ্ঠ চালু"}
+      aria-label={on ? "মিউজিক চালু আছে। বন্ধ করতে চাপো।" : "মিউজিক বন্ধ আছে। চালু করতে চাপো।"}
+      title={on ? "মিউজিক বন্ধ" : "মিউজিক চালু"}
       onClick={(event) => {
         event.stopPropagation();
         setVoiceEnabled(!on);
