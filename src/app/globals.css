@@ -1,0 +1,62 @@
+@import "tailwindcss";
+
+@theme inline {
+  --font-sans: var(--font-hind), "Nirmala UI", "Segoe UI", sans-serif;
+  --font-serif: var(--font-tiro), "Nirmala UI", serif;
+  --color-paper: #e7efe8;
+  --color-paper-2: #f8f4ec;
+  --color-ink: #14211c;
+  --color-muted: #52625b;
+  --color-line: #d5dfd6;
+  --color-copper: #c4623a;
+  --color-copper-deep: #8d3f22;
+  --color-lab: #10161d;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  background:
+    radial-gradient(ellipse 70% 42% at 0% -8%, rgba(255, 248, 236, 0.95), transparent 52%),
+    radial-gradient(ellipse 36% 28% at 100% 0%, rgba(196, 98, 58, 0.1), transparent 46%),
+    var(--color-paper);
+  color: var(--color-ink);
+}
+
+::selection {
+  background: #f0c7b4;
+}
+
+:focus-visible {
+  outline: 3px solid var(--color-copper);
+  outline-offset: 3px;
+}
+
+.labels {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+.float-tag {
+  font-family: var(--font-hind), "Nirmala UI", sans-serif;
+  font-size: 12.5px;
+  font-weight: 700;
+  line-height: 1.35;
+  color: #f6f3ea;
+  background: rgba(16, 22, 29, 0.84);
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  border-radius: 999px;
+  padding: 3px 8px;
+  white-space: nowrap;
+  user-select: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+}

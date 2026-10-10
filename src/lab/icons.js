@@ -1,0 +1,34 @@
+function svg(body) {
+  return `<svg viewBox="0 0 160 100" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">${body}</svg>`;
+}
+
+export const icons = {
+  path: svg(`<path d="M18 70 H78 V28" stroke-dasharray="4 5"/><path d="M18 70 L78 28" stroke="#e7a15a"/><circle cx="18" cy="70" r="3" fill="currentColor"/><circle cx="78" cy="28" r="3" fill="#e7a15a"/>`),
+  freefall: svg(`<path d="M48 18 v52" stroke-dasharray="3 4"/><path d="M112 18 v52" stroke-dasharray="3 4"/><circle cx="48" cy="28" r="10"/><circle cx="112" cy="28" r="6"/><path d="M40 78 h90" stroke="#e7a15a"/>`),
+  projectile: svg(`<path d="M16 78 Q70 10 146 78" stroke="#e7a15a"/><circle cx="78" cy="32" r="5" fill="#e7a15a" stroke="none"/><path d="M16 78 h130"/>`),
+  vector: svg(`<path d="M30 72 L110 72" stroke="#e07a62"/><path d="M30 72 L62 28" stroke="#e7a15a"/><path d="M110 72 L142 28" stroke-dasharray="4 4"/><path d="M62 28 L142 28" stroke-dasharray="4 4"/><path d="M30 72 L142 28" stroke="#9ddec0"/>`),
+  newton2: svg(`<rect x="18" y="28" width="36" height="22" rx="3"/><rect x="18" y="62" width="52" height="22" rx="3"/><path d="M58 39 h28" stroke="#e07a62"/><path d="M74 73 h28" stroke="#e07a62"/>`),
+  torque: svg(`<path d="M36 82 V22 h70 v60"/><path d="M36 22 h8 v60 h-8"/><path d="M104 52 h28" stroke="#e07a62"/><path d="M118 18 a28 28 0 0 1 22 22" stroke="#e7a15a"/>`),
+  tension: svg(`<path d="M16 58 h70"/><circle cx="92" cy="58" r="10"/><path d="M92 68 v20"/><rect x="28" y="46" width="26" height="16"/><rect x="82" y="84" width="16" height="14"/>`),
+  "pulley-fixed": svg(`<path d="M30 16 h100"/><circle cx="80" cy="36" r="16"/><path d="M64 36 v40 M96 36 v40"/><rect x="50" y="72" width="22" height="16"/><rect x="86" y="62" width="22" height="16"/>`),
+  "pulley-move": svg(`<path d="M24 14 h112"/><circle cx="58" cy="62" r="14"/><circle cx="108" cy="30" r="10"/><path d="M44 14 v48 M72 62 C90 62 98 30 98 30 M118 30 v46"/><rect x="44" y="78" width="28" height="14"/>`),
+  friction: svg(`<path d="M16 70 h128"/><rect x="48" y="46" width="40" height="24"/><path d="M28 58 h16" stroke="#e07a62"/><path d="M92 58 h18" stroke="#e7a15a"/>`),
+  inertia: svg(`<path d="M70 78 h28 l-4 -30 h-20 z"/><path d="M62 40 h44"/><circle cx="84" cy="30" r="8"/><path d="M108 40 h30" stroke="#e7a15a"/>`),
+  reaction: svg(`<rect x="18" y="40" width="28" height="20"/><rect x="112" y="36" width="32" height="26"/><path d="M50 50 h18" stroke="#e07a62"/><path d="M92 50 h16" stroke="#e07a62"/><path d="M58 62 q22 16 44 0" stroke="#e7a15a"/>`),
+  collision: svg(`<circle cx="48" cy="52" r="16"/><circle cx="112" cy="52" r="16"/><path d="M70 52 h16" stroke="#9ddec0"/>`),
+  work: svg(`<rect x="58" y="40" width="34" height="24"/><path d="M28 52 h24" stroke="#e07a62"/><path d="M96 70 h30" stroke="#9ddec0"/><path d="M16 78 h128"/>`),
+  energy: svg(`<path d="M20 28 L120 78"/><rect x="58" y="40" width="18" height="14" stroke="#e7a15a"/><path d="M132 70 v-36" stroke="#8fb4e8"/><path d="M146 70 v-20" stroke="#9ddec0"/>`),
+  pressure: svg(`<path d="M36 18 v64 h48 V18"/><path d="M84 30 h30 M84 50 h42 M84 68 h54" stroke="#8fd0ef"/>`),
+  buoyancy: svg(`<path d="M28 22 v58 h104 V22"/><path d="M32 48 h96" stroke="#8fd0ef"/><rect x="64" y="36" width="28" height="22" stroke="#e7a15a"/>`),
+  expansion: svg(`<path d="M24 30 v40 M136 30 v40"/><path d="M32 50 h86" stroke="#e7a15a"/><path d="M40 70 h70" stroke="#e07a62"/>`),
+  pendulum: svg(`<path d="M20 16 h120"/><path d="M48 16 L38 70"/><circle cx="38" cy="76" r="7"/><path d="M80 16 L80 78"/><circle cx="80" cy="84" r="10"/><path d="M118 16 L112 52"/><circle cx="112" cy="58" r="7"/>`),
+  wave: svg(`<path d="M10 50 C30 50 30 22 50 22 S70 78 90 78 S110 22 130 22 S150 50 158 50" stroke="#e7a15a"/><circle cx="90" cy="78" r="4" fill="#e07a62" stroke="none"/>`),
+  sound: svg(`<circle cx="20" cy="50" r="5"/><circle cx="40" cy="50" r="5"/><circle cx="58" cy="50" r="5"/><circle cx="86" cy="50" r="5"/><circle cx="112" cy="50" r="5"/><circle cx="140" cy="50" r="5"/><path d="M70 50 h10" stroke="#e07a62"/>`),
+  reflection: svg(`<path d="M108 14 v72"/><path d="M24 24 L108 50 L30 82" stroke="#e7a15a"/><path d="M78 50 h30" stroke-dasharray="4 4"/>`),
+  refraction: svg(`<path d="M58 12 v76 M102 12 v76"/><path d="M16 28 L58 46 L102 62 L148 82" stroke="#e7a15a"/>`),
+  lens: svg(`<path d="M80 16 C98 34 98 66 80 84 C62 66 62 34 80 16 Z"/><path d="M14 32 H62 L108 50 H150" stroke="#e7a15a"/><path d="M14 50 H150"/><path d="M14 68 H62 L108 50 H150" stroke="#e7a15a"/>`),
+  charge: svg(`<circle cx="48" cy="50" r="18" stroke="#e07a62"/><circle cx="112" cy="50" r="18"/><path d="M48 42 v16 M40 50 h16" stroke="#e07a62"/><path d="M104 50 h16"/>`),
+  circuit: svg(`<rect x="28" y="24" width="104" height="56" rx="4"/><circle cx="80" cy="24" r="8" stroke="#e7a15a"/><path d="M28 52 l10 -8 v16"/>`),
+  magnet: svg(`<path d="M46 30 h28 v40 h-28 z" stroke="#e07a62"/><path d="M86 30 h28 v40 h-28 z"/><path d="M74 30 C110 30 120 70 74 78" stroke="#8fd0ef"/><path d="M46 30 C16 30 10 70 46 78" stroke="#8fd0ef"/>`),
+  halflife: svg(`<circle cx="40" cy="36" r="6"/><circle cx="70" cy="36" r="6"/><circle cx="100" cy="36" r="6"/><circle cx="130" cy="36" r="6"/><circle cx="40" cy="66" r="6" opacity=".35"/><circle cx="70" cy="66" r="6" opacity=".35"/><circle cx="100" cy="66" r="6"/><circle cx="130" cy="66" r="6"/>`),
+};
