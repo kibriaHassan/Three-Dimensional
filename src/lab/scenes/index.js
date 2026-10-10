@@ -3,6 +3,7 @@ import { forceScenes } from "./force.js";
 import { matterScenes } from "./matter.js";
 import { waveScenes } from "./waves.js";
 import { lightScenes } from "./light.js";
+import { opticsScenes } from "./optics.js";
 
 export const chapters = [
   { id: "all", name: "সব" },
@@ -22,7 +23,9 @@ export const demos = [
   ...forceScenes,
   ...matterScenes,
   ...waveScenes,
-  ...lightScenes,
+  ...lightScenes.filter((demo) => demo.chapter === "light"),
+  ...opticsScenes,
+  ...lightScenes.filter((demo) => demo.chapter !== "light"),
 ];
 
 export function demoById(id) {

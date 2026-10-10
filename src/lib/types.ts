@@ -17,6 +17,7 @@ export type Demo = {
   proof: string;
   note: string;
   duration: number;
+  spin?: boolean;
   steps: LessonStep[];
   create: (ctx: never) => { update: (time: number) => void };
 };

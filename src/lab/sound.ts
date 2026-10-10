@@ -237,6 +237,51 @@ const specs: Record<string, Spec> = {
     lead: "16:8 12:8 7:8 0:8",
     harm: "7:8 4:8 2:8 0:8",
   },
+  "mirror-concave": {
+    bpm: 90,
+    root: 38,
+    leadWave: "square",
+    bassWave: "sawtooth",
+    drums: "k..h..s..h.k..h..s..h.k..h..s.h.",
+    bass: "0:4 -2:4 0:4 5:4 0:4 3:4 -2:4 0:4",
+    lead: "0 3 7 12 7 3 0 5 7 10 12 7 3 0 -2 0 5 7 12 15 12 7 3 0 -5 -2 0 3 7 12 7 3",
+  },
+  "mirror-convex": {
+    bpm: 144,
+    root: 51,
+    leadWave: "square",
+    bassWave: "triangle",
+    drums: "x.s.x.s.x.s.x.s.x.s.x.s.x.s.x.s.",
+    bass: "12:2 12:2 10:2 7:2 12:2 15:2 12:2 10:2 7:2 7:2 5:2 3:2 7:2 10:2 12:2 15:2",
+    lead: "19 22 19 15 12 15 19 22 24 22 19 15 12 10 7 10 12 15 19 15 12 7 3 7 12 15 19 22 19 15 12 7",
+  },
+  "lens-convex": {
+    bpm: 114,
+    root: 43,
+    leadWave: "sawtooth",
+    bassWave: "square",
+    drums: "k.h.s.h.k.h.s.S.k.h.s.h.k.h.s.K.",
+    bass: "0:4 5:4 7:4 12:4 7:4 5:4 0:4 -5:4",
+    lead: "24 19 15 12 19 15 12 7 15 12 7 4 12 7 4 0 24 19 15 12 19 15 12 7 16 12 7 4 12 7 4 0",
+  },
+  "lens-concave": {
+    bpm: 118,
+    root: 46,
+    leadWave: "square",
+    bassWave: "sawtooth",
+    drums: "k..s..h.k..s..h.k..s..h.k..s..K.",
+    bass: "0:4 -5:4 0:4 -7:4 0:4 -5:4 -2:4 0:4",
+    lead: "0 4 7 12 16 12 7 4 0 5 9 14 9 5 0 -7 0 4 7 12 16 19 16 12 7 4 0 -2 0 5 7 0",
+  },
+  tir: {
+    bpm: 100,
+    root: 36,
+    leadWave: "sawtooth",
+    bassWave: "square",
+    drums: "k...k...k...k...k.s.k.s.k.S.K.S.",
+    bass: "0:8 0:8 0:4 1:4 0:4 7:4",
+    lead: "0:4 0:4 3:4 0:4 7:2 12:2 15:2 19:2 24:2 19:2 15:2 12:2",
+  },
   charge: {
     bpm: 138,
     root: 42,
@@ -381,12 +426,14 @@ let timer = 0;
 let lastSync: { id: string; time: number; playing: boolean } | null = null;
 const listeners = new Set<() => void>();
 
+let armToken = 0;
 let audioCtx: AudioContext | null = null;
 let leadBus: GainNode | null = null;
 let bassBus: GainNode | null = null;
 let drumBus: GainNode | null = null;
 let noiseBuf: AudioBuffer | null = null;
 let live: { osc: OscillatorNode; gain: GainNode }[] = [];
+let noises: AudioBufferSourceNode[] = [];
 
 function loadPreference() {
   if (loaded || typeof window === "undefined") return;
@@ -455,7 +502,19 @@ function context() {
   return ctx;
 }
 
+function stopNoises() {
+  for (const source of noises) {
+    try {
+      source.stop();
+    } catch {
+      /* already ended */
+    }
+  }
+  noises = [];
+}
+
 function dropLive() {
+  stopNoises();
   const ctx = audioCtx;
   if (!ctx) {
     live = [];
@@ -497,6 +556,10 @@ function burst(ctx: AudioContext, time: number, dur: number, vel: number, freque
   gain.connect(drumBus);
   source.start(time);
   source.stop(time + dur + 0.02);
+  noises.push(source);
+  source.onended = () => {
+    noises = noises.filter((item) => item !== source);
+  };
 }
 
 function strike(ctx: AudioContext, note: Note, time: number, grid: number) {
@@ -588,10 +651,12 @@ function begin(id: string) {
 
 function arm(id: string) {
   if (!enabled) return;
+  const token = ++armToken;
   const ctx = context();
   if (!ctx) return;
+  if (musicOn && playingId !== id) halt();
   void ctx.resume().then(() => {
-    if (!enabled || ctx.state !== "running") return;
+    if (token !== armToken || !enabled || ctx.state !== "running") return;
     if (musicOn && playingId === id) return;
     begin(id);
   });

@@ -280,19 +280,23 @@ function createSession(root) {
 
 export function createViewer(stage, options = {}) {
   const canvas = stage.querySelector("canvas");
+  const coarse = window.matchMedia("(pointer: coarse)").matches;
+  const narrow = (stage.clientWidth || window.innerWidth) < 800;
+  const light = coarse || narrow;
   const renderer = new THREE.WebGLRenderer({
     canvas,
-    antialias: true,
+    antialias: !light,
     alpha: false,
     powerPreference: "high-performance",
   });
-  renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, options.pixelRatio || 1.75));
+  const dprCap = light ? 1.25 : Math.min(options.pixelRatio || 1.5, 1.5);
+  renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, dprCap));
   renderer.setClearColor(0x10161d, 1);
   renderer.outputColorSpace = THREE.SRGBColorSpace;
   renderer.toneMapping = THREE.ACESFilmicToneMapping;
   renderer.toneMappingExposure = 1.08;
   renderer.shadowMap.enabled = true;
-  renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+  renderer.shadowMap.type = light ? THREE.PCFShadowMap : THREE.PCFSoftShadowMap;
 
   const scene = new THREE.Scene();
   scene.background = new THREE.Color(0x10161d);
@@ -304,6 +308,8 @@ export function createViewer(stage, options = {}) {
   const controls = new OrbitControls(camera, canvas);
   controls.enableDamping = true;
   controls.dampingFactor = 0.08;
+  controls.rotateSpeed = coarse ? 0.85 : 0.7;
+  controls.zoomSpeed = coarse ? 0.7 : 0.9;
   controls.maxPolarAngle = Math.PI * 0.49;
   controls.minDistance = 2.4;
   controls.maxDistance = 16;
@@ -316,7 +322,7 @@ export function createViewer(stage, options = {}) {
   const dir = new THREE.DirectionalLight(0xfff6ea, 1.45);
   dir.position.set(5.5, 9.5, 4.5);
   dir.castShadow = true;
-  const shadowSize = options.shadow || 1024;
+  const shadowSize = light ? 512 : Math.min(options.shadow || 1024, 1024);
   dir.shadow.mapSize.set(shadowSize, shadowSize);
   dir.shadow.camera.near = 0.5;
   dir.shadow.camera.far = 28;
@@ -331,7 +337,7 @@ export function createViewer(stage, options = {}) {
   scene.add(fill);
 
   const floor = new THREE.Mesh(
-    new THREE.CircleGeometry(12, 72),
+    new THREE.CircleGeometry(12, light ? 36 : 56),
     new THREE.MeshStandardMaterial({ color: 0x1b2422, roughness: 0.96, metalness: 0.02 })
   );
   floor.rotation.x = -Math.PI / 2;
@@ -405,6 +411,11 @@ export function createViewer(stage, options = {}) {
 
   function loop(now) {
     if (!running) return;
+    if (document.hidden) {
+      last = now;
+      requestAnimationFrame(loop);
+      return;
+    }
     const dt = Math.min(0.05, (now - last) / 1000);
     last = now;
     if (!document.hidden && playing && !scrubbing && demo) {
@@ -463,6 +474,12 @@ export function createViewer(stage, options = {}) {
     setSpin(on) {
       spin = on;
       if (sessionPack) sessionPack.session.spin = on;
+    },
+    setSpinSpeed(value) {
+      const next = Math.max(0, value);
+      controls.autoRotateSpeed = next;
+      spin = next > 0.04;
+      if (sessionPack) sessionPack.session.spin = spin;
     },
     setScrubbing(value) {
       scrubbing = value;

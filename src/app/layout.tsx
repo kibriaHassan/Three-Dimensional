@@ -14,6 +14,12 @@ const tiro = Tiro_Bangla({
   variable: "--font-tiro",
 });
 
+export const viewport = {
+  width: "device-width",
+  initialScale: 1,
+  viewportFit: "cover",
+};
+
 export const metadata: Metadata = {
   title: "ত্রিমাত্র — নবম-দশম পদার্থবিজ্ঞান",
   description:
