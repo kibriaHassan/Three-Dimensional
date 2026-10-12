@@ -1,4 +1,4 @@
-const STORAGE_KEY = "trimatra-music";
+const STORAGE_KEY = "3dsciencezone-music";
 
 type OscKind = "kick" | "snare" | "hat" | "bass" | "lead" | "harm";
 type Wave = "square" | "sawtooth" | "triangle" | "sine";

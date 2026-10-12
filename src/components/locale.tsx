@@ -39,6 +39,14 @@ const ui = {
     rightHand: "ডান হাতের নিয়ম",
     makeRight: "৯০° করে দেখাও",
     tagline: "এসএসসি ও ইন্টার পদার্থ",
+    heroKicker: "এসএসসি · ইন্টার পদার্থবিজ্ঞান",
+    heroLead: "সূত্র মুখস্থ না করে সিমুলেশন চালিয়ে দেখো। তরঙ্গ, আলো, ভেক্টর আর প্রমাণ — সব নিজের হাতে।",
+    zone1: "ইন্টার ১ম",
+    zone1Text: "তরঙ্গ, ভেক্টর ও গতি",
+    zone2: "ইন্টার ২য়",
+    zone2Text: "ভৌত আলোকবিজ্ঞান",
+    zone3: "এসএসসি",
+    zone3Text: "নবম–দশমের প্রমাণ",
     play: "চালাও",
     pause: "থামাও",
     replay: "শুরু",
@@ -80,6 +88,14 @@ const ui = {
     rightHand: "Right-hand rule",
     makeRight: "Set to 90°",
     tagline: "SSC and Inter physics",
+    heroKicker: "SSC · HSC physics",
+    heroLead: "Run the simulation instead of memorising the diagram. Waves, light, vectors and proofs, in your own hands.",
+    zone1: "Inter 1st",
+    zone1Text: "Waves, vectors and motion",
+    zone2: "Inter 2nd",
+    zone2Text: "Physical optics",
+    zone3: "SSC",
+    zone3Text: "Class 9–10 proofs",
     play: "Play",
     pause: "Pause",
     replay: "Reset",
@@ -243,14 +259,14 @@ export function LocaleProvider({ children }: { children: ReactNode }) {
   const [ready, setReady] = useState(false);
 
   useEffect(() => {
-    const saved = window.localStorage.getItem("trimatra-lang");
+    const saved = window.localStorage.getItem("3dsciencezone-lang") || window.localStorage.getItem("trimatra-lang");
     if (saved === "en" || saved === "bn") setLang(saved);
     setReady(true);
   }, []);
 
   useEffect(() => {
     if (!ready) return;
-    window.localStorage.setItem("trimatra-lang", lang);
+    window.localStorage.setItem("3dsciencezone-lang", lang);
     document.documentElement.lang = lang === "en" ? "en" : "bn";
   }, [lang, ready]);
 

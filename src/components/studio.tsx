@@ -6,11 +6,13 @@ import { chapters, demoById, demos } from "@/lab/scenes/index";
 import { cueVoice } from "@/lab/sound";
 import { interPapers } from "@/lib/inter-physics";
 import type { Chapter, Demo } from "@/lib/types";
+import { BrandLockup } from "./brand-mark";
 import { Catalog } from "./catalog";
 import { ChapterBoard, interCount } from "./chapter-board";
 import { chapterEn, sscChapterEn, useLang } from "./locale";
 import { GlobalMute } from "./global-mute";
 import { LabBackdrop } from "./lab-backdrop";
+import { LandingHero } from "./landing-hero";
 import { SiteBar, type Board } from "./site-bar";
 import { TheaterDialog } from "./theater-dialog";
 
@@ -65,11 +67,15 @@ export function Studio() {
     window.history.replaceState(null, "", url);
   }
 
-  function selectBoard(next: Board) {
+  function selectBoard(next: Board, scroll: "top" | "chapters" = "top") {
     setBoard(next);
     setChapter("all");
     setQuery("");
     remember(next, "all");
+    if (scroll === "chapters") {
+      window.requestAnimationFrame(() => document.getElementById("chapters")?.scrollIntoView({ behavior: "smooth", block: "start" }));
+      return;
+    }
     window.scrollTo({ top: 0, behavior: "smooth" });
   }
 
@@ -124,15 +130,7 @@ export function Studio() {
       <LabBackdrop />
       <header className="sticky top-0 z-20 border-b border-line/70 bg-paper/90 backdrop-blur-md">
         <div className="mx-auto flex max-w-6xl flex-wrap items-center justify-between gap-3 px-4 py-3 sm:px-5">
-          <a href="/" className="flex shrink-0 items-center gap-3 text-ink no-underline">
-            <span className="grid h-9 w-9 place-items-center rounded-xl border border-ink bg-paper-2 shadow-[4px_4px_0_#14211c]">
-              <span className="block h-4 w-4 rotate-45 border border-ink bg-gradient-to-br from-transparent from-40% to-copper to-40%" />
-            </span>
-            <span className="hidden sm:block">
-              <strong className="block font-serif text-2xl font-normal leading-none">ত্রিমাত্র</strong>
-              <small className="text-xs text-muted">{t("tagline")}</small>
-            </span>
-          </a>
+          <BrandLockup href="/" caption={t("tagline")} />
           <SiteBar active={board} onSelect={selectBoard} />
         </div>
         <div className="mx-auto flex max-w-6xl gap-2 overflow-x-auto px-4 pb-3 sm:px-5">
@@ -153,10 +151,15 @@ export function Studio() {
         </div>
       </header>
 
-      <main id="top" className="mx-auto max-w-6xl px-4 py-6 pb-16 sm:px-5">
-        <div className="mb-4 flex flex-wrap items-end justify-between gap-3">
+      <main className="mx-auto max-w-6xl px-4 py-6 pb-16 sm:px-5">
+        {chapter === "all" ? <LandingHero onEnter={(next) => selectBoard(next, "chapters")} /> : null}
+        <div id="chapters" className={`${chapter === "all" ? "mt-8" : ""} mb-4 flex scroll-mt-28 flex-wrap items-end justify-between gap-3`}>
           <div>
-            <h1 className="font-serif text-4xl leading-tight sm:text-5xl">{title}</h1>
+            {chapter === "all" ? (
+              <h2 className="font-serif text-4xl leading-tight sm:text-5xl">{title}</h2>
+            ) : (
+              <h1 className="font-serif text-4xl leading-tight sm:text-5xl">{title}</h1>
+            )}
             <p className="mt-2 max-w-2xl text-muted">{lead}</p>
           </div>
           <p className="font-bold text-muted">{lang === "bn" ? `${toBn(shown)}টি দৃশ্য` : `${shown} ${t("scenes")}`}</p>

@@ -20,9 +20,9 @@ export const viewport = {
 };
 
 export const metadata: Metadata = {
-  title: "ত্রিমাত্র — এসএসসি ও ইন্টার পদার্থবিজ্ঞান",
+  title: "3dsciencezone — এসএসসি ও ইন্টার পদার্থবিজ্ঞান",
   description:
-    "নবম-দশমের প্রমাণ ত্রিমাত্র দৃশ্যে, আর ইন্টারের পদার্থবিজ্ঞান ১ম ও ২য় পত্রের প্রতিটি অধ্যায় ব্যাখ্যাসহ।",
+    "3dsciencezone-এ এসএসসি ও ইন্টার পদার্থবিজ্ঞানের সিমুলেশন। তরঙ্গ, আলো, ভেক্টর ও প্রমাণ নিজে চালিয়ে দেখো।",
 };
 
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
