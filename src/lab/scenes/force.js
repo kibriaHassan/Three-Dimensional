@@ -100,57 +100,6 @@ export const forceScenes = [
     },
   },
   {
-    id: "newton2",
-    chapter: "force",
-    chapterNo: "৩",
-    chapterName: "বল",
-    title: "নিউটনের দ্বিতীয় সূত্র",
-    blurb: "একই বল, ভর বেশি হলে ত্বরণ কম।",
-    keywords: "newton second law F=ma বল ত্বরণ ভর",
-    formula: "F = ma",
-    verbal: "বল = ভর × ত্বরণ। ত্বরণ বলের দিকে।",
-    proof: "সমান বল দিলে হালকা গাড়ি তাড়াতাড়ি এগোয়, ভারী গাড়ি পিছিয়ে পড়ে। ত্বরণ ভরের ব্যস্তানুপাতিক।",
-    note: "ভর স্থির থাকলে বল দ্বিগুণ করলে ত্বরণ দ্বিগুণ। বল স্থির থাকলে ভর দ্বিগুণ করলে ত্বরণ অর্ধেক। বেগ নয় — বল ত্বরণের সাথে যুক্ত।",
-    duration: 7,
-    steps: [
-      { t: 0, title: "সমান বল", body: "দুই গাড়িতে সমান লাল তীর, মানে বল সমান। নিচের গাড়ির ভর তিনগুণ।" },
-      { t: 1.2, title: "ত্বরণ আলাদা", body: "হালকা গাড়ি দ্রুত সরে যায়। ভারী গাড়ি একই সময়ে অল্প পথ যায়, কারণ a = F/m।" },
-      { t: 4.2, title: "মনে রাখো", body: "F = ma। বল না থাকলে ত্বরণও থাকে না — বেগ বদলায় না।" },
-    ],
-    create(ctx) {
-      const { C, mesh, mat, THREE, arrow, shoot, tag, vec } = ctx;
-      ctx.frame([2.4, 3.3, 6.6], [0, 0.5, 0]);
-      const rail = mesh(new THREE.BoxGeometry(5.4, 0.06, 1.8), mat({ color: 0x303a3a, roughness: 0.85 }));
-      rail.position.set(0, 0.04, 0);
-      const light = cart(ctx, 0xf0c36a, 0.85);
-      const heavy = cart(ctx, 0x8aa0b8, 1.25);
-      const f1 = arrow(C.force);
-      const f2 = arrow(C.force);
-      const lab1 = tag("ভর m", 0, 1, 0);
-      const lab2 = tag("ভর 3m", 0, 1, 0);
-      light.position.z = -0.48;
-      heavy.position.z = 0.5;
-
-      return {
-        update(t) {
-          const tau = ctx.clamp(t - 0.7, 0, 2.55);
-          const x1 = -1.85 + 0.5 * 0.72 * tau * tau;
-          const x2 = -1.85 + 0.5 * 0.24 * tau * tau;
-          light.position.x = x1;
-          light.position.y = light.userData.base;
-          heavy.position.x = x2;
-          heavy.position.y = heavy.userData.base;
-          const o1 = vec(x1 + 0.35, light.userData.base + 0.15, -0.48);
-          const o2 = vec(x2 + 0.5, heavy.userData.base + 0.15, 0.5);
-          shoot(f1, o1, vec(1.15, 0, 0));
-          shoot(f2, o2, vec(1.15, 0, 0));
-          lab1.position.set(x1, light.userData.base + 0.7, -0.48);
-          lab2.position.set(x2, heavy.userData.base + 0.85, 0.5);
-        },
-      };
-    },
-  },
-  {
     id: "torque",
     chapter: "force",
     chapterNo: "৩",

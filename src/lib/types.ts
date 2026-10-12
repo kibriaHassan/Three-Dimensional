@@ -4,6 +4,12 @@ export type LessonStep = {
   body: string;
 };
 
+export type LessonQuestion = {
+  q: string;
+  formula: string;
+  solve: string;
+};
+
 export type Demo = {
   id: string;
   chapter: string;
@@ -18,7 +24,9 @@ export type Demo = {
   note: string;
   duration: number;
   spin?: boolean;
+  autoProof?: boolean;
   steps: LessonStep[];
+  questions?: LessonQuestion[];
   create: (ctx: never) => { update: (time: number) => void };
 };
 

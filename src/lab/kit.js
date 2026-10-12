@@ -59,13 +59,32 @@ function createSession(root) {
   const materials = new Set();
   const yAxis = new THREE.Vector3(0, 1, 0);
   const tmp = new THREE.Vector3();
+  const hand = { active: false, u: null, angle: null, shown: null };
   const session = {
     spin: true,
+    hand,
+    grabs: [],
+    handsLabel: "তীর ধরে টেনে অবস্থান বদলাও",
     framing: {
       pos: [5.1, 3.15, 6.4],
       target: [0, 1.05, 0],
     },
   };
+
+  function remember(mesh, kind, opts = {}) {
+    session.grabs.push({
+      mesh,
+      kind,
+      min: opts.min,
+      max: opts.max,
+      reach: opts.reach,
+      radius: opts.radius,
+      falling: false,
+      held: false,
+      vel: new THREE.Vector3(),
+      baseScale: null,
+    });
+  }
 
   function add(obj) {
     root.add(obj);
@@ -273,6 +292,16 @@ function createSession(root) {
     lerp,
     seg: segment,
     smooth: smoothstep,
+    hand,
+    lift(mesh, opts) {
+      remember(mesh, "lift", opts);
+    },
+    place(mesh, opts) {
+      remember(mesh, "place", opts);
+    },
+    dial(mesh, opts) {
+      remember(mesh, "dial", opts);
+    },
   };
 
   return { ctx, session, dispose };
@@ -392,7 +421,7 @@ export function createViewer(stage, options = {}) {
   }
 
   function render() {
-    controls.autoRotate = spin && !scrubbing;
+    controls.autoRotate = spin && !scrubbing && !hands;
     controls.update();
     renderer.render(scene, camera);
     labelRenderer.render(scene, camera);
@@ -422,10 +451,357 @@ export function createViewer(stage, options = {}) {
       time += dt * speed;
       if (time >= duration) time %= duration;
     }
-    tickContent();
+    if (hands) stepHands(dt);
+    const live = sessionPack?.session.grabs.some((grab) => grab.kind === "place" || grab.kind === "dial");
+    if (!hands || live) tickContent();
     render();
     onTick(time, duration, playing, failed);
     requestAnimationFrame(loop);
+  }
+
+  const raycaster = new THREE.Raycaster();
+  const pointer = new THREE.Vector2();
+  const dragPlane = new THREE.Plane();
+  const hitPoint = new THREE.Vector3();
+  const handTmp = new THREE.Vector3();
+  const camFlat = new THREE.Vector3();
+  const lastHit = new THREE.Vector3();
+  const pointers = new Set();
+  const pointerAbort = new AbortController();
+  let hands = false;
+  let drag = null;
+  let steer = null;
+  const up = new THREE.Vector3(0, 1, 0);
+
+  function refreshHandsLabel(session) {
+    if (session.grabs.some((grab) => grab.kind === "place")) session.handsLabel = "লক্ষ্যবস্তুর তীর ধরে জায়গা বদলাও";
+    else if (session.grabs.some((grab) => grab.kind === "dial")) session.handsLabel = "উপরে-নিচে টেনে কোণ বদলাও";
+    else session.handsLabel = "তীর ধরে টেনে অবস্থান বদলাও";
+  }
+
+  function bnPlace(value) {
+    const text = (Math.round(value * 10) / 10).toFixed(1);
+    return text.replace("-", "−").replace(/\d/g, (digit) => BN[digit]);
+  }
+
+  function writeSteer() {
+    if (!steer) return;
+    const pos = steer.group.position;
+    const disp = Math.hypot(pos.x - steer.origin.x, pos.z - steer.origin.z);
+    steer.el.textContent = `তীরের জায়গা\nx ${bnPlace(pos.x)}   z ${bnPlace(pos.z)}\nদূরত্ব ${bnPlace(steer.travel)}   সরণ ${bnPlace(disp)}`;
+  }
+
+  function removeSteer() {
+    if (!steer) return;
+    steer.group.removeFromParent();
+    steer.el.remove();
+    for (const geo of steer.geos) geo.dispose();
+    for (const material of steer.materials) material.dispose();
+    const grabs = sessionPack?.session.grabs;
+    if (grabs) {
+      const index = grabs.findIndex((grab) => grab.mesh === steer.group);
+      if (index >= 0) grabs.splice(index, 1);
+    }
+    steer = null;
+  }
+
+  function ensureArrow() {
+    const session = sessionPack?.session;
+    if (!session || steer) return;
+    if (session.grabs.some((grab) => grab.kind === "place" || grab.kind === "dial")) return;
+    const color = 0xf0c36a;
+    const material = new THREE.MeshStandardMaterial({
+      color,
+      emissive: color,
+      emissiveIntensity: 0.42,
+      roughness: 0.32,
+      metalness: 0.12,
+    });
+    const ringMat = new THREE.MeshStandardMaterial({
+      color,
+      emissive: color,
+      emissiveIntensity: 0.22,
+      roughness: 0.4,
+      side: THREE.DoubleSide,
+    });
+    const shaftGeo = new THREE.CylinderGeometry(0.04, 0.04, 0.78, 14);
+    const headGeo = new THREE.ConeGeometry(0.13, 0.3, 18);
+    const ringGeo = new THREE.RingGeometry(0.18, 0.34, 28);
+    ringGeo.rotateX(-Math.PI / 2);
+    const shaft = new THREE.Mesh(shaftGeo, material);
+    const head = new THREE.Mesh(headGeo, material);
+    const ring = new THREE.Mesh(ringGeo, ringMat);
+    shaft.castShadow = true;
+    head.castShadow = true;
+    shaft.position.y = 0.39;
+    head.position.y = 0.93;
+    ring.position.y = 0.025;
+    const group = new THREE.Group();
+    group.add(shaft, head, ring);
+    const target = session.framing?.target || [0, 0.4, 0];
+    const cam = session.framing?.pos || [0, 3, 6];
+    const dx = cam[0] - target[0];
+    const dz = cam[2] - target[2];
+    const span = Math.hypot(dx, dz) || 1;
+    group.position.set(target[0] + (dx / span) * 1.15, 0.02, target[2] + (dz / span) * 1.15);
+    root.add(group);
+    const el = document.createElement("div");
+    el.className = "float-tag";
+    el.style.whiteSpace = "pre-line";
+    el.style.textAlign = "left";
+    const label = new CSS2DObject(el);
+    label.position.set(0.35, 1.25, 0);
+    group.add(label);
+    session.grabs.push({
+      mesh: group,
+      kind: "steer",
+      reach: 1.15,
+      held: false,
+      falling: false,
+      vel: new THREE.Vector3(),
+      baseScale: null,
+    });
+    steer = {
+      group,
+      geos: [shaftGeo, headGeo, ringGeo],
+      materials: [material, ringMat],
+      el,
+      origin: group.position.clone(),
+      travel: 0,
+    };
+    writeSteer();
+  }
+
+  function setWorld(mesh, point) {
+    const parent = mesh.parent;
+    if (!parent) {
+      mesh.position.copy(point);
+      return;
+    }
+    parent.updateWorldMatrix(true, false);
+    mesh.position.copy(parent.worldToLocal(point.clone()));
+  }
+
+  function setPointer(event) {
+    const rect = canvas.getBoundingClientRect();
+    pointer.x = ((event.clientX - rect.left) / Math.max(rect.width, 1)) * 2 - 1;
+    pointer.y = -((event.clientY - rect.top) / Math.max(rect.height, 1)) * 2 + 1;
+  }
+
+  function pickGrab() {
+    raycaster.setFromCamera(pointer, camera);
+    let best = null;
+    let bestScore = Infinity;
+    for (const grab of sessionPack?.session.grabs || []) {
+      if (!grab.mesh) continue;
+      grab.mesh.getWorldPosition(handTmp);
+      const dist = raycaster.ray.distanceToPoint(handTmp);
+      const reach = grab.reach ?? 0.4;
+      if (dist > reach) continue;
+      const along = handTmp.dot(raycaster.ray.direction) - raycaster.ray.origin.dot(raycaster.ray.direction);
+      if (along < 0.05) continue;
+      const score = along + dist * 5;
+      if (score < bestScore) {
+        bestScore = score;
+        best = grab;
+      }
+    }
+    return best;
+  }
+
+  function beginLift(grab, now) {
+    camera.getWorldDirection(camFlat);
+    camFlat.y = 0;
+    if (camFlat.lengthSq() < 1e-4) camFlat.set(0, 0, 1);
+    else camFlat.normalize();
+    grab.mesh.getWorldPosition(handTmp);
+    drag.planeNormal.copy(camFlat);
+    drag.planePoint.copy(handTmp);
+    dragPlane.setFromNormalAndCoplanarPoint(camFlat, handTmp);
+    raycaster.setFromCamera(pointer, camera);
+    if (raycaster.ray.intersectPlane(dragPlane, hitPoint)) drag.offset.copy(handTmp).sub(hitPoint);
+    else drag.offset.set(0, 0, 0);
+    lastHit.copy(handTmp);
+    drag.lastT = now;
+    grab.held = true;
+    grab.falling = false;
+    grab.vel.set(0, 0, 0);
+    grab.baseScale = grab.mesh.scale.clone();
+    grab.mesh.scale.multiplyScalar(1.06);
+  }
+
+  function moveLift(grab, now) {
+    dragPlane.setFromNormalAndCoplanarPoint(drag.planeNormal, drag.planePoint);
+    raycaster.setFromCamera(pointer, camera);
+    if (!raycaster.ray.intersectPlane(dragPlane, hitPoint)) return;
+    hitPoint.add(drag.offset);
+    const radius = grab.radius ?? 0.18;
+    hitPoint.y = clamp(hitPoint.y, radius, 3.6);
+    hitPoint.x = clamp(hitPoint.x, -6, 6);
+    hitPoint.z = clamp(hitPoint.z, -6, 6);
+    const dt = Math.min(0.05, (now - drag.lastT) / 1000);
+    if (dt > 0.004) grab.vel.copy(hitPoint).sub(lastHit).multiplyScalar(1 / dt);
+    lastHit.copy(hitPoint);
+    drag.lastT = now;
+    setWorld(grab.mesh, hitPoint);
+  }
+
+  function movePlace(grab) {
+    camera.getWorldDirection(camFlat);
+    if (camFlat.lengthSq() < 1e-6) camFlat.set(0, 0, 1);
+    grab.mesh.getWorldPosition(handTmp);
+    dragPlane.setFromNormalAndCoplanarPoint(camFlat, handTmp);
+    raycaster.setFromCamera(pointer, camera);
+    if (!raycaster.ray.intersectPlane(dragPlane, hitPoint)) return;
+    sessionPack.session.hand.u = clamp(hitPoint.x, grab.min ?? -3.35, grab.max ?? -0.42);
+  }
+
+  function moveDial(grab, event) {
+    const rect = canvas.getBoundingClientRect();
+    const dy = (event.clientY - drag.lastY) / Math.max(rect.height, 1);
+    drag.lastY = event.clientY;
+    const session = sessionPack.session;
+    const base = Number.isFinite(session.hand.angle) ? session.hand.angle : (session.hand.shown ?? 30);
+    session.hand.angle = clamp(base - dy * 110, grab.min ?? 18, grab.max ?? 68);
+  }
+
+  function beginSteer(grab) {
+    grab.mesh.getWorldPosition(handTmp);
+    drag.planeNormal.copy(up);
+    drag.planePoint.copy(handTmp);
+    dragPlane.setFromNormalAndCoplanarPoint(up, handTmp);
+    raycaster.setFromCamera(pointer, camera);
+    if (raycaster.ray.intersectPlane(dragPlane, hitPoint)) drag.offset.copy(handTmp).sub(hitPoint);
+    else drag.offset.set(0, 0, 0);
+    grab.baseScale = grab.mesh.scale.clone();
+    grab.mesh.scale.multiplyScalar(1.06);
+  }
+
+  function moveSteer(grab) {
+    dragPlane.setFromNormalAndCoplanarPoint(drag.planeNormal, drag.planePoint);
+    raycaster.setFromCamera(pointer, camera);
+    if (!raycaster.ray.intersectPlane(dragPlane, hitPoint)) return;
+    hitPoint.add(drag.offset);
+    const nextX = clamp(hitPoint.x, -5, 5);
+    const nextZ = clamp(hitPoint.z, -5, 5);
+    const dx = nextX - grab.mesh.position.x;
+    const dz = nextZ - grab.mesh.position.z;
+    steer.travel += Math.hypot(dx, dz);
+    grab.mesh.position.x = nextX;
+    grab.mesh.position.z = nextZ;
+    writeSteer();
+  }
+
+  function endDrag(releasePhysics) {
+    if (drag?.grab?.kind === "lift") {
+      const grab = drag.grab;
+      grab.held = false;
+      if (grab.baseScale) grab.mesh.scale.copy(grab.baseScale);
+      grab.baseScale = null;
+      if (releasePhysics) {
+        const speed = grab.vel.length();
+        if (speed > 6) grab.vel.multiplyScalar(6 / speed);
+        grab.falling = true;
+      } else {
+        grab.vel.set(0, 0, 0);
+        grab.falling = false;
+      }
+    }
+    if (drag?.grab?.kind === "steer" && drag.grab.baseScale) {
+      drag.grab.mesh.scale.copy(drag.grab.baseScale);
+      drag.grab.baseScale = null;
+    }
+    drag = null;
+    controls.enabled = true;
+    if (canvas) canvas.style.cursor = hands ? "grab" : "";
+  }
+
+  function stepHands(dt) {
+    const grabs = sessionPack?.session.grabs;
+    if (!grabs) return;
+    for (const grab of grabs) {
+      if (grab.kind !== "lift" || grab.held || !grab.falling) continue;
+      grab.vel.y -= 7.5 * dt;
+      grab.vel.x *= Math.exp(-0.8 * dt);
+      grab.vel.z *= Math.exp(-0.8 * dt);
+      grab.mesh.getWorldPosition(handTmp);
+      handTmp.addScaledVector(grab.vel, dt);
+      handTmp.x = clamp(handTmp.x, -6, 6);
+      handTmp.z = clamp(handTmp.z, -6, 6);
+      const radius = grab.radius ?? 0.18;
+      if (handTmp.y <= radius) {
+        handTmp.y = radius;
+        if (grab.vel.y < -1.1) grab.vel.y *= -0.32;
+        else {
+          grab.vel.set(0, 0, 0);
+          grab.falling = false;
+        }
+      }
+      setWorld(grab.mesh, handTmp);
+    }
+  }
+
+  function onPointerDown(event) {
+    pointers.add(event.pointerId);
+    if (!hands || !sessionPack) return;
+    if (pointers.size > 1) {
+      endDrag(false);
+      return;
+    }
+    setPointer(event);
+    const grab = pickGrab();
+    if (!grab) return;
+    event.preventDefault();
+    event.stopImmediatePropagation();
+    drag = {
+      grab,
+      lastY: event.clientY,
+      lastT: performance.now(),
+      offset: new THREE.Vector3(),
+      planeNormal: new THREE.Vector3(),
+      planePoint: new THREE.Vector3(),
+    };
+    if (grab.kind === "lift") beginLift(grab, drag.lastT);
+    else if (grab.kind === "steer") beginSteer(grab);
+    else if (grab.kind === "place" && !Number.isFinite(sessionPack.session.hand.u)) {
+      grab.mesh.getWorldPosition(handTmp);
+      sessionPack.session.hand.u = clamp(handTmp.x, grab.min ?? -3.35, grab.max ?? -0.42);
+    } else if (grab.kind === "dial" && !Number.isFinite(sessionPack.session.hand.angle)) {
+      sessionPack.session.hand.angle = sessionPack.session.hand.shown ?? 30;
+    }
+    controls.enabled = false;
+    canvas.style.cursor = "grabbing";
+    try {
+      canvas.setPointerCapture(event.pointerId);
+    } catch {
+      /* পয়েন্টার ইতিমধ্যে ছেড়ে গেলে ধরা লাগে না */
+    }
+  }
+
+  function onPointerMove(event) {
+    if (!drag) return;
+    event.preventDefault();
+    setPointer(event);
+    const grab = drag.grab;
+    if (grab.kind === "lift") moveLift(grab, performance.now());
+    else if (grab.kind === "steer") moveSteer(grab);
+    else if (grab.kind === "place") movePlace(grab);
+    else moveDial(grab, event);
+    if (grab.kind !== "lift" && grab.kind !== "steer") tickContent();
+    render();
+  }
+
+  function onPointerUp(event) {
+    pointers.delete(event.pointerId);
+    if (drag) endDrag(true);
+  }
+
+  if (canvas) {
+    const listen = { capture: true, signal: pointerAbort.signal };
+    canvas.addEventListener("pointerdown", onPointerDown, listen);
+    canvas.addEventListener("pointermove", onPointerMove, listen);
+    canvas.addEventListener("pointerup", onPointerUp, listen);
+    canvas.addEventListener("pointercancel", onPointerUp, listen);
   }
 
   const resizeObserver = new ResizeObserver(() => resize());
@@ -434,6 +810,12 @@ export function createViewer(stage, options = {}) {
 
   return {
     load(next) {
+      removeSteer();
+      hands = false;
+      drag = null;
+      pointers.clear();
+      controls.enabled = true;
+      if (canvas) canvas.style.cursor = "";
       if (sessionPack) sessionPack.dispose();
       failed = null;
       demo = next;
@@ -441,6 +823,7 @@ export function createViewer(stage, options = {}) {
       time = 0;
       sessionPack = createSession(root);
       runtime = next.create(sessionPack.ctx) || { update() {} };
+      refreshHandsLabel(sessionPack.session);
       spin = sessionPack.session.spin && options.spin !== false;
       applyFrame(sessionPack.session.framing);
       tickContent();
@@ -465,7 +848,8 @@ export function createViewer(stage, options = {}) {
     },
     setTime(value) {
       time = clamp(value, 0, Math.max(duration - 0.001, 0));
-      tickContent();
+      const live = sessionPack?.session.grabs.some((grab) => grab.kind === "place" || grab.kind === "dial");
+      if (!hands || live) tickContent();
       render();
     },
     setSpeed(value) {
@@ -483,6 +867,39 @@ export function createViewer(stage, options = {}) {
     },
     setScrubbing(value) {
       scrubbing = value;
+    },
+    setHands(on) {
+      hands = !!on;
+      const session = sessionPack?.session;
+      if (!session) return hands;
+      session.hand.active = hands;
+      endDrag(false);
+      if (!hands) {
+        session.hand.u = null;
+        session.hand.angle = null;
+        for (const grab of session.grabs) {
+          grab.held = false;
+          grab.falling = false;
+          grab.vel.set(0, 0, 0);
+          if (grab.baseScale) grab.mesh.scale.copy(grab.baseScale);
+          grab.baseScale = null;
+        }
+        removeSteer();
+      } else {
+        ensureArrow();
+        for (const grab of session.grabs) {
+          if (grab.kind === "place" && grab.mesh && !grab.mesh.visible) session.hand.u = -2.1;
+        }
+      }
+      refreshHandsLabel(session);
+      if (canvas) canvas.style.cursor = hands ? "grab" : "";
+      const live = session.grabs.some((grab) => grab.kind === "place" || grab.kind === "dial");
+      if (!hands || live) tickContent();
+      render();
+      return hands;
+    },
+    getHandsHint() {
+      return sessionPack?.session.handsLabel || "তীর ধরে টেনে অবস্থান বদলাও";
     },
     getSpin() {
       return spin;
@@ -514,6 +931,8 @@ export function createViewer(stage, options = {}) {
     },
     dispose() {
       running = false;
+      pointerAbort.abort();
+      removeSteer();
       resizeObserver.disconnect();
       if (sessionPack) sessionPack.dispose();
       controls.dispose();

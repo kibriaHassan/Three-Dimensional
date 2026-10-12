@@ -67,6 +67,19 @@ function describe(img, f, kind) {
   return `বিম্ব: ${zone(img.v, f, kind)}\n${nature}`;
 }
 
+function indexForU(u) {
+  let best = 1;
+  let bestD = Infinity;
+  for (let i = 1; i < PATH.length; i += 1) {
+    const d = Math.abs(PATH[i] - u);
+    if (d < bestD) {
+      bestD = d;
+      best = i;
+    }
+  }
+  return best;
+}
+
 function pose(t) {
   const span = PATH.length * SLOT;
   const clock = ((t % span) + span) % span;
@@ -209,6 +222,7 @@ function makeOptics(spec) {
       const extB = ray(PAPER, true);
 
       const objectArrow = ctx.arrow(C.force);
+      ctx.place(objectArrow, { min: -3.35, max: -0.42, reach: 0.72 });
       const imageArrow = ctx.arrow(C.velocity);
       const objectTag = tag("বস্তু", 0, 0, Z);
       const imageTag = tag("বিম্ব", 0, 0, Z);
@@ -376,7 +390,11 @@ function makeOptics(spec) {
 
       return {
         update(t) {
-          const place = pose(t);
+          const scripted = pose(t);
+          const live = ctx.hand.active && Number.isFinite(ctx.hand.u);
+          const place = live
+            ? { index: indexForU(ctx.hand.u), objectInfinity: false, u: ctx.hand.u }
+            : scripted;
           const img = place.objectInfinity ? { mode: "object-infinity" } : solve(place.u, f, kind);
           banner.set(`${spec.steps[place.index].title}\n${describe(img, f, kind)}`);
           if (place.objectInfinity) {
@@ -484,6 +502,7 @@ function tirScene() {
       geo.translate(0, 0, -0.28);
       const block = mesh(geo, glass({ opacity: 0.42, color: 0xc9eee4 }), false);
       block.position.y = gy;
+      ctx.dial(block, { min: 18, max: 68, reach: 1.4 });
 
       const foot = mesh(new THREE.CylinderGeometry(0.7, 0.82, 0.1, 24), mat({ color: C.wood, roughness: 0.74 }));
       foot.position.set(-0.35, 0.08, 0);
@@ -542,7 +561,9 @@ function tirScene() {
           const index = Math.min(2, Math.floor(clock / span));
           const local = (clock - index * span) / span;
           const blend = local < 0.16 ? smooth(local / 0.16) : 1;
-          const degrees = targets[(index + 2) % 3] + (targets[index] - targets[(index + 2) % 3]) * blend;
+          let degrees = targets[(index + 2) % 3] + (targets[index] - targets[(index + 2) % 3]) * blend;
+          if (ctx.hand.active && Number.isFinite(ctx.hand.angle)) degrees = ctx.hand.angle;
+          ctx.hand.shown = degrees;
           const angle = (degrees * Math.PI) / 180;
           const hit = vec(0, gy, z);
           const dirIn = vec(Math.cos(angle), -Math.sin(angle), 0);

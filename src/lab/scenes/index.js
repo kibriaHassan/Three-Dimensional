@@ -1,4 +1,6 @@
 import { motionScenes } from "./motion.js";
+import { motionLabScenes } from "./motion-lab.js";
+import { newtonScenes } from "./newton.js";
 import { forceScenes } from "./force.js";
 import { matterScenes } from "./matter.js";
 import { waveScenes } from "./waves.js";
@@ -20,6 +22,8 @@ export const chapters = [
 
 export const demos = [
   ...motionScenes,
+  ...motionLabScenes,
+  ...newtonScenes,
   ...forceScenes,
   ...matterScenes,
   ...waveScenes,

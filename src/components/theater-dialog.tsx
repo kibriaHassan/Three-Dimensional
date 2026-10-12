@@ -26,6 +26,8 @@ export function TheaterDialog({ demo, onClose, onStep }: Props) {
   const [playing, setPlaying] = useState(true);
   const [stepIndex, setStepIndex] = useState(0);
   const [error, setError] = useState<string | null>(null);
+  const [handsMode, setHandsMode] = useState(false);
+  const [handsHint, setHandsHint] = useState("তীর ধরে টেনে অবস্থান বদলাও");
   onCloseRef.current = onClose;
   onStepRef.current = onStep;
 
@@ -33,8 +35,17 @@ export function TheaterDialog({ demo, onClose, onStep }: Props) {
     setPlaying(true);
     setStepIndex(0);
     setError(null);
+    setHandsMode(false);
+    viewerRef.current?.setHands(false);
     if (rangeRef.current) rangeRef.current.value = "0";
   }, [demo.id]);
+
+  useEffect(() => {
+    if (playing && handsMode) {
+      viewerRef.current?.setHands(false);
+      setHandsMode(false);
+    }
+  }, [playing, handsMode]);
 
   useEffect(() => {
     function onKey(event: KeyboardEvent) {
@@ -94,8 +105,37 @@ export function TheaterDialog({ demo, onClose, onStep }: Props) {
               }}
             />
             <SceneMic />
-            <p className="pointer-events-none absolute bottom-3 left-3 z-10 max-w-[68%] rounded-full bg-black/45 px-3 py-1 text-xs text-white">
-              এক আঙুলে ঘোরাও
+            <div className="absolute top-3 left-3 z-20 flex rounded-full bg-black/55 p-1 text-xs font-bold text-white shadow-lg backdrop-blur-sm">
+              <button
+                type="button"
+                aria-pressed={!handsMode}
+                onClick={() => {
+                  viewerRef.current?.setHands(false);
+                  setHandsMode(false);
+                  viewerRef.current?.play();
+                  setPlaying(true);
+                }}
+                className={`rounded-full px-3 py-2 ${handsMode ? "text-white/75" : "bg-paper-2 text-ink"}`}
+              >
+                চলছে
+              </button>
+              <button
+                type="button"
+                aria-pressed={handsMode}
+                onClick={() => {
+                  viewerRef.current?.pause();
+                  setPlaying(false);
+                  viewerRef.current?.setHands(true);
+                  setHandsHint(viewerRef.current?.getHandsHint() || "তীর ধরে টেনে অবস্থান বদলাও");
+                  setHandsMode(true);
+                }}
+                className={`rounded-full px-3 py-2 ${handsMode ? "bg-copper text-white" : "text-white/75"}`}
+              >
+                নাড়াও
+              </button>
+            </div>
+            <p className="pointer-events-none absolute bottom-3 left-3 z-10 max-w-[78%] rounded-full bg-black/45 px-3 py-1 text-xs text-white">
+              {handsMode ? handsHint : "এক আঙুলে ঘোরাও · খালি জায়গায় ঘোরো"}
             </p>
           </div>
           <PlaybackBar

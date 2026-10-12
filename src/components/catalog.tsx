@@ -4,6 +4,7 @@ import { toBn } from "@/lab/kit";
 import { icons } from "@/lab/icons";
 import { chapters, demos } from "@/lab/scenes/index";
 import type { Chapter, Demo } from "@/lib/types";
+import { demoEn, sscChapterEn, useLang } from "./locale";
 
 const catalog = demos as Demo[];
 const chapterList = chapters as Chapter[];
@@ -15,21 +16,26 @@ type Props = {
   onChapter: (id: string) => void;
   onQuery: (value: string) => void;
   onOpen: (id: string) => void;
+  embedded?: boolean;
 };
 
-export function Catalog({ chapter, query, visible, onChapter, onQuery, onOpen }: Props) {
+export function Catalog({ chapter, query, visible, onChapter, onQuery, onOpen, embedded = false }: Props) {
+  const { lang, t } = useLang();
+  const count = lang === "bn" ? `${toBn(visible.length)}টি দৃশ্য` : `${visible.length} ${t("scenes")}`;
 
   return (
-    <section id="catalog" className="mx-auto max-w-6xl px-4 py-8 sm:px-5">
-      <div className="flex flex-wrap items-end justify-between gap-3">
-        <div>
-          <p className="text-sm font-bold text-copper-deep">পাঠ্যবইয়ের ধারা</p>
-          <h2 className="font-serif text-4xl">প্রমাণের তালিকা</h2>
+    <section id="catalog" className={embedded ? "" : "mx-auto max-w-6xl px-4 py-8 sm:px-5"}>
+      {embedded ? null : (
+        <div className="flex flex-wrap items-end justify-between gap-3">
+          <div>
+            <p className="text-sm font-bold text-copper-deep">নবম–দশম · ত্রিমাত্র দৃশ্য</p>
+            <h2 className="font-serif text-4xl">{t("sscTitle")}</h2>
+          </div>
+          <p className="font-bold text-muted">{count}</p>
         </div>
-        <p className="font-bold text-muted">{toBn(visible.length)}টি দৃশ্য</p>
-      </div>
+      )}
 
-      <div className="mt-5 flex gap-2 overflow-x-auto pb-1">
+      {embedded ? null : <div className="mt-5 flex gap-2 overflow-x-auto pb-1">
         {chapterList.map((item) => {
           const count = item.id === "all" ? catalog.length : catalog.filter((demo) => demo.chapter === item.id).length;
           const on = chapter === item.id;
@@ -41,25 +47,25 @@ export function Catalog({ chapter, query, visible, onChapter, onQuery, onOpen }:
               onClick={() => onChapter(item.id)}
               className={`shrink-0 rounded-full border px-3 py-1.5 text-sm font-semibold ${on ? "border-ink bg-ink text-paper-2" : "border-line bg-white/60"}`}
             >
-              {item.name} {toBn(count)}
+              {(lang === "en" ? sscChapterEn[item.id] ?? item.name : item.name)} {lang === "bn" ? toBn(count) : count}
             </button>
           );
         })}
-      </div>
+      </div>}
 
       <label className="mt-4 block max-w-md">
-        <span className="sr-only">প্রমাণ খোঁজো</span>
+        <span className="sr-only">{t("search")}</span>
         <input
           value={query}
           onChange={(event) => onQuery(event.target.value)}
           type="search"
-          placeholder="খুঁজো: টর্ক, কপিকল, টান, দোলক, প্রতিসরণ…"
+          placeholder={t("search")}
           className="w-full rounded-2xl border border-line bg-white px-4 py-3 outline-none"
         />
       </label>
 
       {visible.length === 0 ? (
-        <p className="mt-8 text-muted">এই নামে কোনো প্রমাণ নেই। টর্ক, কপিকল বা টান লিখে দেখো।</p>
+        <p className="mt-8 text-muted">{t("emptySearch")}</p>
       ) : (
         <div className="mt-5 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
           {visible.map((demo) => (
@@ -75,12 +81,12 @@ export function Catalog({ chapter, query, visible, onChapter, onQuery, onOpen }:
               />
               <span className="flex flex-1 flex-col gap-2 p-4">
                 <span className="text-xs font-bold text-copper-deep">
-                  অধ্যায় {demo.chapterNo} · {demo.chapterName}
+                  {lang === "en" ? sscChapterEn[demo.chapter] ?? demo.chapterName : `অধ্যায় ${demo.chapterNo} · ${demo.chapterName}`}
                 </span>
-                <span className="font-serif text-2xl leading-tight text-ink sm:text-[1.65rem]">{demo.title}</span>
+                <span className="font-serif text-2xl leading-tight text-ink sm:text-[1.65rem]">{lang === "en" ? demoEn[demo.id] ?? demo.title : demo.title}</span>
                 <span className="font-serif text-lg text-copper-deep">{demo.formula}</span>
-                <span className="flex-1 text-sm leading-relaxed text-muted">{demo.blurb}</span>
-                <span className="text-sm font-bold">দৃশ্য চালাও →</span>
+                {lang === "bn" ? <span className="flex-1 text-sm leading-relaxed text-muted">{demo.blurb}</span> : <span className="flex-1" />}
+                <span className="text-sm font-bold">{t("open")} →</span>
               </span>
             </button>
           ))}

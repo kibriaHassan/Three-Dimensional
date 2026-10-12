@@ -1,17 +1,16 @@
 import type { Metadata } from "next";
-import { Hind_Siliguri, Tiro_Bangla } from "next/font/google";
+import { Noto_Serif_Bengali, Nunito_Sans } from "next/font/google";
+import { LocaleProvider } from "@/components/locale";
 import "./globals.css";
 
-const hind = Hind_Siliguri({
-  subsets: ["bengali", "latin"],
-  weight: ["400", "500", "600", "700"],
-  variable: "--font-hind",
+const nunito = Nunito_Sans({
+  subsets: ["latin"],
+  variable: "--font-nunito",
 });
 
-const tiro = Tiro_Bangla({
+const notoBengali = Noto_Serif_Bengali({
   subsets: ["bengali", "latin"],
-  weight: "400",
-  variable: "--font-tiro",
+  variable: "--font-noto-bn",
 });
 
 export const viewport = {
@@ -21,15 +20,17 @@ export const viewport = {
 };
 
 export const metadata: Metadata = {
-  title: "ত্রিমাত্র — নবম-দশম পদার্থবিজ্ঞান",
+  title: "ত্রিমাত্র — এসএসসি ও ইন্টার পদার্থবিজ্ঞান",
   description:
-    "নবম ও দশম শ্রেণির পদার্থবিজ্ঞানের বল, টর্ক, টান, কপিকলসহ প্রমাণগুলো ছোট ত্রিমাত্রিক দৃশ্যে।",
+    "নবম-দশমের প্রমাণ ত্রিমাত্র দৃশ্যে, আর ইন্টারের পদার্থবিজ্ঞান ১ম ও ২য় পত্রের প্রতিটি অধ্যায় ব্যাখ্যাসহ।",
 };
 
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
   return (
-    <html lang="bn" className={`${hind.variable} ${tiro.variable}`}>
-      <body className="min-h-dvh font-sans antialiased">{children}</body>
+    <html lang="bn" className={`${nunito.variable} ${notoBengali.variable}`}>
+      <body className="min-h-dvh font-sans antialiased">
+        <LocaleProvider>{children}</LocaleProvider>
+      </body>
     </html>
   );
 }

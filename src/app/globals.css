@@ -1,8 +1,8 @@
 @import "tailwindcss";
 
 @theme inline {
-  --font-sans: var(--font-hind), "Nirmala UI", "Segoe UI", sans-serif;
-  --font-serif: var(--font-tiro), "Nirmala UI", serif;
+  --font-sans: var(--font-nunito), var(--font-noto-bn), "Nirmala UI", sans-serif;
+  --font-serif: var(--font-nunito), var(--font-noto-bn), "Nirmala UI", serif;
   --color-paper: #e7efe8;
   --color-paper-2: #f8f4ec;
   --color-ink: #14211c;
@@ -18,11 +18,117 @@ html {
 }
 
 body {
+  position: relative;
+  z-index: 0;
   background:
     radial-gradient(ellipse 70% 42% at 0% -8%, rgba(255, 248, 236, 0.95), transparent 52%),
     radial-gradient(ellipse 36% 28% at 100% 0%, rgba(196, 98, 58, 0.1), transparent 46%),
     var(--color-paper);
   color: var(--color-ink);
+}
+
+.lab-world {
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  overflow: hidden;
+  pointer-events: none;
+  perspective: 1100px;
+}
+
+.lab-world-glow {
+  position: absolute;
+  top: 8%;
+  right: 6%;
+  width: 42vw;
+  height: 42vw;
+  max-width: 520px;
+  max-height: 520px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(196, 98, 58, 0.16), transparent 68%);
+  filter: blur(8px);
+}
+
+.lab-world-grid {
+  position: absolute;
+  right: -12%;
+  bottom: -8%;
+  left: -12%;
+  height: 58%;
+  background-image:
+    linear-gradient(rgba(20, 33, 28, 0.08) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(20, 33, 28, 0.08) 1px, transparent 1px);
+  background-size: 56px 56px;
+  transform: rotateX(68deg);
+  transform-origin: center top;
+  mask-image: linear-gradient(to bottom, transparent, #000 16%, #000 62%, transparent);
+  animation: lab-grid 18s linear infinite;
+}
+
+.lab-solid,
+.lab-ring {
+  position: absolute;
+  animation: lab-float 16s ease-in-out infinite;
+}
+
+.lab-solid {
+  border: 1px solid rgba(20, 33, 28, 0.16);
+  background: linear-gradient(150deg, rgba(255, 255, 255, 0.55), rgba(196, 98, 58, 0.16));
+  box-shadow:
+    14px 22px 40px rgba(20, 33, 28, 0.08),
+    inset 0 1px 0 rgba(255, 255, 255, 0.7);
+  backdrop-filter: blur(2px);
+}
+
+.lab-solid-a {
+  top: 14%;
+  right: 7%;
+  width: 88px;
+  height: 88px;
+  border-radius: 18px;
+  animation-duration: 15s;
+}
+
+.lab-solid-b {
+  top: 46%;
+  left: 4%;
+  width: 64px;
+  height: 108px;
+  border-radius: 16px;
+  animation-duration: 18s;
+  animation-delay: -6s;
+}
+
+.lab-solid-c {
+  right: 14%;
+  bottom: 16%;
+  width: 72px;
+  height: 72px;
+  border-radius: 12px;
+  animation-duration: 13s;
+  animation-delay: -3s;
+}
+
+.lab-ring {
+  top: 64%;
+  left: 5%;
+  width: 120px;
+  height: 120px;
+  border: 12px solid rgba(20, 33, 28, 0.12);
+  border-radius: 50%;
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.55);
+  animation-duration: 20s;
+  animation-delay: -8s;
+}
+
+@keyframes lab-grid {
+  from { background-position: 0 0, 0 0; }
+  to { background-position: 0 56px, 56px 0; }
+}
+
+@keyframes lab-float {
+  0%, 100% { transform: translate3d(0, 0, 0) rotateX(16deg) rotateY(-24deg) rotateZ(6deg); }
+  50% { transform: translate3d(10px, -18px, 36px) rotateX(28deg) rotateY(8deg) rotateZ(16deg); }
 }
 
 ::selection {
@@ -45,8 +151,79 @@ canvas {
   pointer-events: none;
 }
 
+.proof-rise {
+  animation: proof-rise 0.48s ease;
+}
+
+@keyframes proof-rise {
+  from {
+    opacity: 0;
+    transform: translateY(18px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.coin-stage {
+  display: grid;
+  width: 108px;
+  height: 108px;
+  place-items: center;
+  perspective: 760px;
+}
+
+.coin {
+  display: grid;
+  width: 96px;
+  height: 96px;
+  place-items: center;
+  border-radius: 999px;
+  transform: rotateX(16deg) rotateY(-18deg);
+  background:
+    radial-gradient(circle at 32% 26%, rgba(255, 248, 236, 0.55), transparent 34%),
+    radial-gradient(circle at 50% 58%, #31464a 0%, #10161d 70%);
+  box-shadow:
+    0 16px 24px rgba(20, 33, 28, 0.22),
+    inset 0 0 0 7px rgba(255, 244, 230, 0.16),
+    inset 0 -12px 16px rgba(0, 0, 0, 0.38);
+  transition: transform 0.45s ease;
+}
+
+.coin-stage[data-on="1"] .coin,
+.coin-stage:hover .coin {
+  transform: rotateX(8deg) rotateY(14deg) translateY(-4px);
+}
+
+.coin-face {
+  display: grid;
+  justify-items: center;
+  gap: 2px;
+  color: #f6f1e6;
+}
+
+.coin-glyph {
+  display: block;
+  width: 42px;
+  height: 42px;
+}
+
+.coin-glyph svg {
+  width: 100%;
+  height: 100%;
+}
+
+.vec-range {
+  width: 100%;
+  height: 1.35rem;
+  accent-color: #c4623a;
+  cursor: pointer;
+}
+
 .float-tag {
-  font-family: var(--font-hind), "Nirmala UI", sans-serif;
+  font-family: var(--font-nunito), var(--font-noto-bn), "Nirmala UI", sans-serif;
   font-size: 12.5px;
   font-weight: 700;
   line-height: 1.35;
@@ -62,5 +239,18 @@ canvas {
 @media (prefers-reduced-motion: reduce) {
   html {
     scroll-behavior: auto;
+  }
+
+  .lab-world-grid,
+  .lab-solid,
+  .lab-ring,
+  .proof-rise {
+    animation: none;
+  }
+
+  .coin,
+  .coin-stage:hover .coin,
+  .coin-stage[data-on="1"] .coin {
+    transform: none;
   }
 }
