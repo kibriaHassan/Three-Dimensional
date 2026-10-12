@@ -44,7 +44,7 @@ const ui = {
     zone1: "ইন্টার ১ম",
     zone1Text: "তরঙ্গ, ভেক্টর ও গতি",
     zone2: "ইন্টার ২য়",
-    zone2Text: "ভৌত আলোকবিজ্ঞান",
+    zone2Text: "তাপগতিবিদ্যা ও আলো",
     zone3: "এসএসসি",
     zone3Text: "নবম–দশমের প্রমাণ",
     play: "চালাও",
@@ -53,6 +53,7 @@ const ui = {
     slow: "ধীরে",
     opticsChapter: "ভৌত আলোকবিজ্ঞান",
     waveChapter: "তরঙ্গ অধ্যায়",
+    thermoChapter: "তাপগতিবিদ্যা অধ্যায়",
   },
   en: {
     inter1: "Inter 1st",
@@ -93,7 +94,7 @@ const ui = {
     zone1: "Inter 1st",
     zone1Text: "Waves, vectors and motion",
     zone2: "Inter 2nd",
-    zone2Text: "Physical optics",
+    zone2Text: "Thermodynamics and light",
     zone3: "SSC",
     zone3Text: "Class 9–10 proofs",
     play: "Play",
@@ -102,6 +103,7 @@ const ui = {
     slow: "Slow",
     opticsChapter: "Physical optics",
     waveChapter: "Waves",
+    thermoChapter: "Thermodynamics",
   },
 } as const;
 

@@ -8,6 +8,7 @@ import { interPapers, type InterChapter } from "@/lib/inter-physics";
 import type { Demo } from "@/lib/types";
 import { opticsModels, sectionLabel } from "@/optics-lab/catalog";
 import { vectorModels } from "@/vector-lab/catalog";
+import { thermoModels, thermoSection } from "@/thermo-lab/catalog";
 import { sectionLabel as waveSection, waveModels } from "@/wave-lab/catalog";
 import { chapterEn, demoEn, useLang, vectorEn } from "./locale";
 import type { Board } from "./site-bar";
@@ -32,7 +33,8 @@ export function interCount(paperId: Board, chapterId: string) {
   const vectors = chapters.some((chapter) => chapter.id === "vector") ? vectorModels.length : 0;
   const optics = chapters.some((chapter) => chapter.id === "phys-optics") ? opticsModels.length : 0;
   const waves = chapters.some((chapter) => chapter.id === "wave") ? waveModels.length : 0;
-  return scenes + vectors + optics + waves;
+  const thermo = chapters.some((chapter) => chapter.id === "thermo") ? thermoModels.length : 0;
+  return scenes + vectors + optics + waves + thermo;
 }
 
 export function ChapterBoard({
@@ -73,6 +75,13 @@ export function ChapterBoard({
       })
     : [];
 
+  const thermo = selected.some((chapter) => chapter.id === "thermo")
+    ? thermoModels.filter((model) => {
+        if (!q) return true;
+        return `${model.title} ${model.blurb} ${model.titleEn} ${model.blurbEn}`.toLowerCase().includes(q);
+      })
+    : [];
+
   const demos = selected.flatMap((chapter) =>
     scenesOf(chapter)
       .map((id) => demoById(id) as Demo | null)
@@ -84,7 +93,7 @@ export function ChapterBoard({
   );
 
   const chapter = paper.chapters.find((item) => item.id === chapterId);
-  const empty = models.length === 0 && optics.length === 0 && waves.length === 0 && demos.length === 0;
+  const empty = models.length === 0 && optics.length === 0 && waves.length === 0 && thermo.length === 0 && demos.length === 0;
 
   return (
     <div>
@@ -164,6 +173,28 @@ export function ChapterBoard({
                 </span>
                 <span className="flex flex-1 flex-col gap-2 p-4">
                   <span className="text-xs font-bold text-copper-deep">{sectionLabel(model.section, lang)}</span>
+                  <span className="font-serif text-2xl leading-tight">{title}</span>
+                  <span className="font-serif text-lg text-copper-deep">{model.formula}</span>
+                  <span className="flex-1 text-sm leading-relaxed text-muted">{blurb}</span>
+                  <span className="text-sm font-bold">{t("open")} →</span>
+                </span>
+              </Link>
+            );
+          })}
+          {thermo.map((model) => {
+            const title = lang === "en" ? model.titleEn : model.title;
+            const blurb = lang === "en" ? model.blurbEn : model.blurb;
+            return (
+              <Link
+                key={`thermo-${model.slug}`}
+                href={`/thermo/${model.slug}`}
+                className="flex flex-col overflow-hidden rounded-3xl border border-line bg-white text-ink no-underline shadow-sm transition duration-200 hover:-translate-y-1 hover:shadow-[0_18px_40px_rgba(20,33,28,0.1)]"
+              >
+                <span className="grid h-32 place-items-center bg-[#152028] font-serif text-5xl text-[#f3eadc] sm:h-36">
+                  {lang === "bn" ? toBn(model.no) : model.no}
+                </span>
+                <span className="flex flex-1 flex-col gap-2 p-4">
+                  <span className="text-xs font-bold text-copper-deep">{thermoSection(model.section, lang)}</span>
                   <span className="font-serif text-2xl leading-tight">{title}</span>
                   <span className="font-serif text-lg text-copper-deep">{model.formula}</span>
                   <span className="flex-1 text-sm leading-relaxed text-muted">{blurb}</span>
