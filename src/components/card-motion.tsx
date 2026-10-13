@@ -2,7 +2,7 @@
 
 import { useId, type ReactNode } from "react";
 
-type Kind = "vector" | "wave" | "optics" | "thermo";
+type Kind = "vector" | "wave" | "optics" | "thermo" | "energy";
 
 const WAVE = "M-80 52 C-60 22 -40 22 -20 52 S20 82 40 52 S80 22 100 52 S140 82 160 52 S200 22 220 52 S260 82 280 52";
 
@@ -343,9 +343,68 @@ function thermoArt(family: string): ReactNode {
   );
 }
 
+function energyArt(family: string): ReactNode {
+  if (family === "spring") {
+    return (
+      <>
+        <path d="M18 28 V72" />
+        <g className="spring">
+          {[0, 1, 2, 3, 4, 5].map((i) => (
+            <path key={i} d={`M${32 + i * 14} 38 q7 -16 14 0 t14 0`} stroke="#e7a15a" />
+          ))}
+        </g>
+        <rect className="slide-short" x="108" y="40" width="22" height="18" />
+      </>
+    );
+  }
+  if (family === "swing" || family === "orbit") {
+    return (
+      <>
+        <path d="M20 18 H140" />
+        <path d="M80 18 L52 72" stroke="#e7a15a" />
+        <circle className="bob" cx="52" cy="76" r="7" fill="#e7a15a" stroke="none" />
+        {family === "orbit" ? <ellipse cx="80" cy="54" rx="46" ry="16" /> : null}
+      </>
+    );
+  }
+  if (family === "graph" || family === "bars" || family === "power") {
+    return (
+      <>
+        <path d="M28 16 V84 H146" />
+        <rect className="bar" x="48" y="46" width="18" height="38" stroke="#8fd0ef" />
+        <rect className="bar delay-1" x="78" y="28" width="18" height="56" stroke="#e7a15a" />
+        <rect className="bar delay-2" x="108" y="38" width="18" height="46" stroke="#9ddec0" />
+      </>
+    );
+  }
+  if (family === "crash") {
+    return (
+      <>
+        <circle className="slide" cx="48" cy="50" r="14" stroke="#e07a62" />
+        <circle cx="112" cy="50" r="14" />
+      </>
+    );
+  }
+  if (family === "track" || family === "trade" || family === "lift") {
+    return (
+      <>
+        <path d="M16 72 Q50 18 84 72 Q112 40 146 58" stroke="#9ddec0" />
+        <circle className="slide-short" cx="48" cy="40" r="6" fill="#e7a15a" stroke="none" />
+      </>
+    );
+  }
+  return (
+    <>
+      <path d="M16 70 H146" />
+      <rect className="slide" x="36" y="46" width="28" height="20" />
+      <path d="M70 56 H108" stroke="#e7a15a" />
+    </>
+  );
+}
+
 export function CardMotion({ kind, name }: { kind: Kind; name: string }) {
   const clip = useId().replace(/:/g, "");
-  const picture = kind === "vector" ? vectorArt(name) : kind === "wave" ? waveArt(name, clip) : kind === "optics" ? opticsArt(name, clip) : thermoArt(name);
+  const picture = kind === "vector" ? vectorArt(name) : kind === "wave" ? waveArt(name, clip) : kind === "optics" ? opticsArt(name, clip) : kind === "energy" ? energyArt(name) : thermoArt(name);
 
   return (
     <svg viewBox="0 0 160 100" className="card-motion h-24 w-full" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">

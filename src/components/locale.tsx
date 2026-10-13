@@ -54,6 +54,7 @@ const ui = {
     opticsChapter: "ভৌত আলোকবিজ্ঞান",
     waveChapter: "তরঙ্গ অধ্যায়",
     thermoChapter: "তাপগতিবিদ্যা অধ্যায়",
+    energyChapter: "কাজ, শক্তি ও ক্ষমতা",
   },
   en: {
     inter1: "HSC 1st",
@@ -104,6 +105,7 @@ const ui = {
     opticsChapter: "Physical optics",
     waveChapter: "Waves",
     thermoChapter: "Thermodynamics",
+    energyChapter: "Work, energy and power",
   },
 } as const;
 
@@ -128,7 +130,7 @@ export const chapterEn: Record<string, string> = {
   vector: "Vectors",
   dynamics: "Dynamics",
   newton: "Newtonian mechanics",
-  energy: "Work and energy",
+  energy: "Work, energy and power",
   gravity: "Gravitation",
   matter: "Properties of matter",
   shm: "Periodic motion",

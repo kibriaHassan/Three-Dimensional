@@ -8,6 +8,7 @@ import { interPapers, type InterChapter } from "@/lib/inter-physics";
 import type { Demo } from "@/lib/types";
 import { opticsModels, sectionLabel } from "@/optics-lab/catalog";
 import { vectorModels } from "@/vector-lab/catalog";
+import { energyModels, energySection } from "@/energy-lab/catalog";
 import { thermoModels, thermoSection } from "@/thermo-lab/catalog";
 import { sectionLabel as waveSection, waveModels } from "@/wave-lab/catalog";
 import { CardMotion } from "./card-motion";
@@ -31,7 +32,7 @@ function chapterLabel(chapters: InterChapter[], sceneId: string, lang: "bn" | "e
 }
 
 export function scenesOf(chapter: InterChapter) {
-  if (chapter.id === "vector") return [];
+  if (chapter.id === "vector" || chapter.id === "energy") return [];
   if (chapter.sceneIds?.length) return chapter.sceneIds;
   return chapter.sceneId ? [chapter.sceneId] : [];
 }
@@ -45,7 +46,8 @@ export function interCount(paperId: Board, chapterId: string) {
   const optics = chapters.some((chapter) => chapter.id === "phys-optics") ? opticsModels.length : 0;
   const waves = chapters.some((chapter) => chapter.id === "wave") ? waveModels.length : 0;
   const thermo = chapters.some((chapter) => chapter.id === "thermo") ? thermoModels.length : 0;
-  return scenes + vectors + optics + waves + thermo;
+  const energy = chapters.some((chapter) => chapter.id === "energy") ? energyModels.length : 0;
+  return scenes + vectors + optics + waves + thermo + energy;
 }
 
 export function ChapterBoard({
@@ -86,6 +88,13 @@ export function ChapterBoard({
       })
     : [];
 
+  const energy = selected.some((chapter) => chapter.id === "energy")
+    ? energyModels.filter((model) => {
+        if (!q) return true;
+        return `${model.title} ${model.blurb} ${model.titleEn} ${model.blurbEn}`.toLowerCase().includes(q);
+      })
+    : [];
+
   const thermo = selected.some((chapter) => chapter.id === "thermo")
     ? thermoModels.filter((model) => {
         if (!q) return true;
@@ -104,7 +113,7 @@ export function ChapterBoard({
   );
 
   const chapter = paper.chapters.find((item) => item.id === chapterId);
-  const empty = models.length === 0 && optics.length === 0 && waves.length === 0 && thermo.length === 0 && demos.length === 0;
+  const empty = models.length === 0 && optics.length === 0 && waves.length === 0 && thermo.length === 0 && energy.length === 0 && demos.length === 0;
 
   return (
     <div>
@@ -184,6 +193,28 @@ export function ChapterBoard({
                 </span>
                 <span className="flex flex-1 flex-col gap-2 p-4">
                   <span className="text-xs font-bold text-copper-deep">{sectionLabel(model.section, lang)}</span>
+                  {serialTitle(model.no, title, lang)}
+                  <span className="font-serif text-lg text-copper-deep">{model.formula}</span>
+                  <span className="flex-1 text-sm leading-relaxed text-muted">{blurb}</span>
+                  <span className="text-sm font-bold">{t("open")} →</span>
+                </span>
+              </Link>
+            );
+          })}
+          {energy.map((model) => {
+            const title = lang === "en" ? model.titleEn : model.title;
+            const blurb = lang === "en" ? model.blurbEn : model.blurb;
+            return (
+              <Link
+                key={`energy-${model.slug}`}
+                href={`/energy/${model.slug}`}
+                className="flex flex-col overflow-hidden rounded-3xl border border-line bg-white text-ink no-underline shadow-sm transition duration-200 hover:-translate-y-1 hover:shadow-[0_18px_40px_rgba(20,33,28,0.1)]"
+              >
+                <span className="grid h-32 place-items-center overflow-hidden bg-[#152028] px-5 text-[#f3eadc] sm:h-36">
+                  <CardMotion kind="energy" name={model.family} />
+                </span>
+                <span className="flex flex-1 flex-col gap-2 p-4">
+                  <span className="text-xs font-bold text-copper-deep">{energySection(model.section, lang)}</span>
                   {serialTitle(model.no, title, lang)}
                   <span className="font-serif text-lg text-copper-deep">{model.formula}</span>
                   <span className="flex-1 text-sm leading-relaxed text-muted">{blurb}</span>
