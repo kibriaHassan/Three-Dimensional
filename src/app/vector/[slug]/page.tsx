@@ -14,7 +14,7 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
   const model = modelBySlug(slug);
   return {
     title: model ? `${model.title} — ভেক্টর অধ্যায়` : "ভেক্টর অধ্যায়",
-    description: model?.blurb ?? "ইন্টার ১ম পত্রের ভেক্টর অধ্যায়ের ত্রিমাত্র দৃশ্য",
+    description: model?.blurb ?? "HSC ১ম পত্রের ভেক্টর অধ্যায়ের ত্রিমাত্র দৃশ্য",
   };
 }
 

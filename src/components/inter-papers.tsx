@@ -26,7 +26,7 @@ export function InterPapers({ onOpenScene }: Props) {
         <div className="grid gap-6 border-b border-line px-5 py-6 sm:px-8 lg:grid-cols-[1.2fr_0.8fr] lg:items-end">
           <div>
             <p className="text-sm font-bold text-copper-deep">একাদশ–দ্বাদশ · এনসিটিবি</p>
-            <h2 className="mt-1 font-serif text-4xl leading-tight sm:text-5xl">ইন্টার পদার্থবিজ্ঞান</h2>
+            <h2 className="mt-1 font-serif text-4xl leading-tight sm:text-5xl">HSC পদার্থবিজ্ঞান</h2>
             <p className="mt-3 max-w-xl text-base leading-relaxed text-muted">{paper.lead}</p>
           </div>
           <div className="grid grid-cols-2 gap-2" role="tablist" aria-label="পত্র">

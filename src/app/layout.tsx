@@ -20,9 +20,9 @@ export const viewport = {
 };
 
 export const metadata: Metadata = {
-  title: "3dsciencezone — এসএসসি ও ইন্টার পদার্থবিজ্ঞান",
+  title: "3dsciencezone — এসএসসি ও HSC পদার্থবিজ্ঞান",
   description:
-    "3dsciencezone-এ এসএসসি ও ইন্টার পদার্থবিজ্ঞানের সিমুলেশন। তরঙ্গ, আলো, ভেক্টর ও প্রমাণ নিজে চালিয়ে দেখো।",
+    "3dsciencezone-এ এসএসসি ও HSC পদার্থবিজ্ঞানের সিমুলেশন। তরঙ্গ, আলো, ভেক্টর ও প্রমাণ নিজে চালিয়ে দেখো।",
 };
 
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {

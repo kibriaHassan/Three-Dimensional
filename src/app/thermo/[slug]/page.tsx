@@ -13,7 +13,7 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
   const model = modelBySlug(slug);
   return {
     title: model ? `${model.title} — তাপগতিবিদ্যা` : "তাপগতিবিদ্যা",
-    description: model?.blurb ?? "ইন্টার ২য় পত্রের তাপগতিবিদ্যা অধ্যায়ের ত্রিমাত্র দৃশ্য",
+    description: model?.blurb ?? "HSC ২য় পত্রের তাপগতিবিদ্যা অধ্যায়ের ত্রিমাত্র দৃশ্য",
   };
 }
 

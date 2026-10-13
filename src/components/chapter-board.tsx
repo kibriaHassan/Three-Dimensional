@@ -10,8 +10,19 @@ import { opticsModels, sectionLabel } from "@/optics-lab/catalog";
 import { vectorModels } from "@/vector-lab/catalog";
 import { thermoModels, thermoSection } from "@/thermo-lab/catalog";
 import { sectionLabel as waveSection, waveModels } from "@/wave-lab/catalog";
+import { CardMotion } from "./card-motion";
 import { chapterEn, demoEn, useLang, vectorEn } from "./locale";
 import type { Board } from "./site-bar";
+
+function serialTitle(no: number, title: string, lang: "bn" | "en") {
+  const label = lang === "bn" ? toBn(no) : String(no);
+  return (
+    <span className="flex items-baseline gap-2">
+      <span className="shrink-0 font-serif text-xl leading-none text-copper-deep">{label}.</span>
+      <span className="font-serif text-2xl leading-tight">{title}</span>
+    </span>
+  );
+}
 
 function chapterLabel(chapters: InterChapter[], sceneId: string, lang: "bn" | "en") {
   const owner = chapters.find((chapter) => scenesOf(chapter).includes(sceneId));
@@ -124,12 +135,12 @@ export function ChapterBoard({
                 href={`/vector/${model.slug}`}
                 className="flex flex-col overflow-hidden rounded-3xl border border-line bg-white text-ink no-underline shadow-sm transition duration-200 hover:-translate-y-1 hover:shadow-[0_18px_40px_rgba(20,33,28,0.1)]"
               >
-                <span className="grid h-32 place-items-center bg-[#152028] font-serif text-5xl text-[#f3eadc] sm:h-36">
-                  {lang === "bn" ? toBn(model.no) : model.no}
+                <span className="grid h-32 place-items-center overflow-hidden bg-[#152028] px-5 text-[#f3eadc] sm:h-36">
+                  <CardMotion kind="vector" name={model.slug} />
                 </span>
                 <span className="flex flex-1 flex-col gap-2 p-4">
                   <span className="text-xs font-bold text-copper-deep">{t("vectorChapter")}</span>
-                  <span className="font-serif text-2xl leading-tight">{title}</span>
+                  {serialTitle(model.no, title, lang)}
                   <span className="font-serif text-lg text-copper-deep">{model.formula}</span>
                   <span className="flex-1 text-sm leading-relaxed text-muted">{blurb}</span>
                   <span className="text-sm font-bold">{t("open")} →</span>
@@ -146,12 +157,12 @@ export function ChapterBoard({
                 href={`/wave/${model.slug}`}
                 className="flex flex-col overflow-hidden rounded-3xl border border-line bg-white text-ink no-underline shadow-sm transition duration-200 hover:-translate-y-1 hover:shadow-[0_18px_40px_rgba(20,33,28,0.1)]"
               >
-                <span className="grid h-32 place-items-center bg-[#152028] font-serif text-5xl text-[#f3eadc] sm:h-36">
-                  {lang === "bn" ? toBn(model.no) : model.no}
+                <span className="grid h-32 place-items-center overflow-hidden bg-[#152028] px-5 text-[#f3eadc] sm:h-36">
+                  <CardMotion kind="wave" name={model.family} />
                 </span>
                 <span className="flex flex-1 flex-col gap-2 p-4">
                   <span className="text-xs font-bold text-copper-deep">{waveSection(model.section, lang)}</span>
-                  <span className="font-serif text-2xl leading-tight">{title}</span>
+                  {serialTitle(model.no, title, lang)}
                   <span className="font-serif text-lg text-copper-deep">{model.formula}</span>
                   <span className="flex-1 text-sm leading-relaxed text-muted">{blurb}</span>
                   <span className="text-sm font-bold">{t("open")} →</span>
@@ -168,12 +179,12 @@ export function ChapterBoard({
                 href={`/optics/${model.slug}`}
                 className="flex flex-col overflow-hidden rounded-3xl border border-line bg-white text-ink no-underline shadow-sm transition duration-200 hover:-translate-y-1 hover:shadow-[0_18px_40px_rgba(20,33,28,0.1)]"
               >
-                <span className="grid h-32 place-items-center bg-[#152028] font-serif text-5xl text-[#f3eadc] sm:h-36">
-                  {lang === "bn" ? toBn(model.no) : model.no}
+                <span className="grid h-32 place-items-center overflow-hidden bg-[#152028] px-5 text-[#f3eadc] sm:h-36">
+                  <CardMotion kind="optics" name={model.family} />
                 </span>
                 <span className="flex flex-1 flex-col gap-2 p-4">
                   <span className="text-xs font-bold text-copper-deep">{sectionLabel(model.section, lang)}</span>
-                  <span className="font-serif text-2xl leading-tight">{title}</span>
+                  {serialTitle(model.no, title, lang)}
                   <span className="font-serif text-lg text-copper-deep">{model.formula}</span>
                   <span className="flex-1 text-sm leading-relaxed text-muted">{blurb}</span>
                   <span className="text-sm font-bold">{t("open")} →</span>
@@ -190,12 +201,12 @@ export function ChapterBoard({
                 href={`/thermo/${model.slug}`}
                 className="flex flex-col overflow-hidden rounded-3xl border border-line bg-white text-ink no-underline shadow-sm transition duration-200 hover:-translate-y-1 hover:shadow-[0_18px_40px_rgba(20,33,28,0.1)]"
               >
-                <span className="grid h-32 place-items-center bg-[#152028] font-serif text-5xl text-[#f3eadc] sm:h-36">
-                  {lang === "bn" ? toBn(model.no) : model.no}
+                <span className="grid h-32 place-items-center overflow-hidden bg-[#152028] px-5 text-[#f3eadc] sm:h-36">
+                  <CardMotion kind="thermo" name={model.family} />
                 </span>
                 <span className="flex flex-1 flex-col gap-2 p-4">
                   <span className="text-xs font-bold text-copper-deep">{thermoSection(model.section, lang)}</span>
-                  <span className="font-serif text-2xl leading-tight">{title}</span>
+                  {serialTitle(model.no, title, lang)}
                   <span className="font-serif text-lg text-copper-deep">{model.formula}</span>
                   <span className="flex-1 text-sm leading-relaxed text-muted">{blurb}</span>
                   <span className="text-sm font-bold">{t("open")} →</span>
