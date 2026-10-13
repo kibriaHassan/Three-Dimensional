@@ -4,16 +4,14 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
 import { createPortal } from "react-dom";
-import { chapters as sscChapters } from "@/lab/scenes/index";
+import { sscGraphChapters } from "@/graph-lab/ssc-chapters";
 import { interPapers } from "@/lib/inter-physics";
-import type { Chapter } from "@/lib/types";
 import { toBn } from "@/vector-lab/math";
 import { chapterEn, sscChapterEn, useLang } from "./locale";
 
 export type Board = "paper-1" | "paper-2" | "ssc";
 
 const boards: Board[] = ["paper-1", "paper-2", "ssc"];
-const sscList = (sscChapters as Chapter[]).filter((item) => item.id !== "all");
 
 export function SiteBar({ active, onSelect }: { active?: Board; onSelect?: (board: Board) => void }) {
   const { lang, t, toggleLang } = useLang();
@@ -45,7 +43,7 @@ export function SiteBar({ active, onSelect }: { active?: Board; onSelect?: (boar
     };
   }, [open]);
 
-  const groups = [
+  const groups: { id: Board; title: string; items: { id: string; label: string; no?: number }[] }[] = [
     {
       id: "paper-1",
       title: t("paper1Title"),
@@ -65,9 +63,10 @@ export function SiteBar({ active, onSelect }: { active?: Board; onSelect?: (boar
     {
       id: "ssc",
       title: t("sscTitle"),
-      items: sscList.map((item) => ({
+      items: sscGraphChapters.map((item) => ({
         id: item.id,
-        label: lang === "en" ? sscChapterEn[item.id] ?? item.name : item.name,
+        no: item.no,
+        label: lang === "en" ? sscChapterEn[item.id] ?? item.title : item.title,
       })),
     },
   ];
@@ -105,11 +104,11 @@ export function SiteBar({ active, onSelect }: { active?: Board; onSelect?: (boar
               <ul className="mt-2 grid gap-1">
                 {group.items.map((item, index) => {
                   const key = `${group.id}:${item.id}`;
-                  const linked = group.id === "paper-1" || group.id === "paper-2";
+                  const linked = group.id === "paper-1" || group.id === "paper-2" || group.id === "ssc";
                   const current = linked && path === `/graph/${item.id}`;
                   const on = current || picked === key;
                   const row = `grid w-full grid-cols-[2.2rem_minmax(0,1fr)] items-center gap-1 rounded-2xl px-2 py-2 text-left text-sm font-semibold ${on ? "bg-[#f6f1e6] text-ink" : "text-[#f6f1e6] hover:bg-white/8"}`;
-                  const mark = <span className={`font-serif ${on ? "text-copper-deep" : "text-[#f0d48a]"}`}>{toBn(index + 1)}</span>;
+                  const mark = <span className={`font-serif ${on ? "text-copper-deep" : "text-[#f0d48a]"}`}>{toBn(item.no ?? index + 1)}</span>;
                   return (
                     <li key={key}>
                       {linked ? (

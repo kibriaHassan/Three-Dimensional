@@ -3,9 +3,10 @@
 import Link from "next/link";
 import { useMemo, useState } from "react";
 import { BrandLockup } from "@/components/brand-mark";
-import { chapterEn, useLang } from "@/components/locale";
+import { chapterEn, sscChapterEn, useLang } from "@/components/locale";
 import { SiteBar } from "@/components/site-bar";
 import { interPapers } from "@/lib/inter-physics";
+import { sscGraphChapters } from "./ssc-chapters";
 import { toBn } from "@/vector-lab/math";
 import { GraphCard } from "./card";
 import { graphsFor } from "./catalog";
@@ -22,11 +23,16 @@ export function GraphStudio({ chapter }: { chapter: string }) {
   const { lang, t } = useLang();
   const [query, setQuery] = useState("");
   const [filter, setFilter] = useState<(typeof filters)[number]["id"]>("all");
-  const paper = interPapers.find((item) => item.chapters.some((entry) => entry.id === chapter)) ?? interPapers[0];
-  const chapters = paper.chapters;
-  const paperShort = paper.id === "paper-2" ? "HSC ২য়" : "HSC ১ম";
-  const paperLong = paper.id === "paper-2" ? "HSC ২য় পত্র" : "HSC ১ম পত্র";
+  const sscHit = sscGraphChapters.some((item) => item.id === chapter);
+  const paper = interPapers.find((item) => item.chapters.some((entry) => entry.id === chapter));
+  const boardId = sscHit ? "ssc" : paper?.id ?? "paper-1";
+  const chapters = sscHit
+    ? sscGraphChapters
+    : (paper ?? interPapers[0]).chapters.map((item, index) => ({ id: item.id, no: index + 1, title: item.title, blurb: item.blurb }));
+  const paperShort = sscHit ? "SSC" : boardId === "paper-2" ? "HSC ২য়" : "HSC ১ম";
+  const paperLong = sscHit ? "SSC" : boardId === "paper-2" ? "HSC ২য় পত্র" : "HSC ১ম পত্র";
   const current = chapters.find((item) => item.id === chapter);
+  const labelOf = (id: string, title: string) => (lang === "en" ? chapterEn[id] ?? sscChapterEn[id] ?? title : title);
   const all = graphsFor(chapter);
 
   const shown = useMemo(() => {
@@ -43,7 +49,7 @@ export function GraphStudio({ chapter }: { chapter: string }) {
       <header className="sticky top-0 z-20 border-b border-line/80 bg-paper/92 shadow-[inset_0_-3px_0_#c4623a] backdrop-blur-md">
         <div className="mx-auto flex max-w-6xl flex-wrap items-center justify-between gap-3 px-4 py-3 sm:px-5">
           <BrandLockup href="/" caption={t("graph")} />
-          <SiteBar active={paper.id} />
+          <SiteBar active={boardId} />
         </div>
       </header>
       <div className="mx-auto grid max-w-6xl gap-6 px-4 py-5 sm:px-5 lg:grid-cols-[15.5rem_minmax(0,1fr)] lg:py-8">
@@ -54,7 +60,7 @@ export function GraphStudio({ chapter }: { chapter: string }) {
             <ul className="mt-2 grid gap-1">
               {chapters.map((item, index) => {
                 const on = item.id === chapter;
-                const label = lang === "en" ? chapterEn[item.id] ?? item.title : item.title;
+                const label = labelOf(item.id, item.title);
                 return (
                   <li key={item.id}>
                     <Link
@@ -62,7 +68,7 @@ export function GraphStudio({ chapter }: { chapter: string }) {
                       aria-current={on ? "page" : undefined}
                       className={`grid grid-cols-[2rem_minmax(0,1fr)] items-center rounded-2xl px-2 py-2 text-sm font-semibold no-underline ${on ? "bg-[#f6f1e6] text-ink" : "text-[#f6f1e6] hover:bg-white/10"}`}
                     >
-                      <span className={`font-serif ${on ? "text-copper-deep" : "text-[#f0d48a]"}`}>{toBn(index + 1)}</span>
+                      <span className={`font-serif ${on ? "text-copper-deep" : "text-[#f0d48a]"}`}>{toBn(item.no)}</span>
                       {label}
                     </Link>
                   </li>
@@ -75,7 +81,7 @@ export function GraphStudio({ chapter }: { chapter: string }) {
           <nav className="mb-4 flex gap-2 overflow-x-auto pb-1 lg:hidden">
             {chapters.map((item) => {
               const on = item.id === chapter;
-              const label = lang === "en" ? chapterEn[item.id] ?? item.title : item.title;
+              const label = labelOf(item.id, item.title);
               return (
                 <Link
                   key={item.id}
@@ -128,7 +134,7 @@ export function GraphStudio({ chapter }: { chapter: string }) {
           ) : (
             <>
               <h1 className="font-serif text-4xl">এই অধ্যায়ের গ্রাফ নেই</h1>
-              <p className="mt-3 max-w-xl text-sm leading-relaxed text-muted">HSC ১ম ও ২য় পত্রের অধ্যায়ের গ্রাফ আছে। তালিকা থেকে একটি অধ্যায় খোলো।</p>
+              <p className="mt-3 max-w-xl text-sm leading-relaxed text-muted">HSC ও SSC-এর অধ্যায়ের গ্রাফ আছে। তালিকা থেকে একটি অধ্যায় খোলো।</p>
             </>
           )}
         </main>

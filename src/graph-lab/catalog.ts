@@ -19,6 +19,18 @@ import { modernGraphs } from "./graphs/p2-modern";
 import { nucleusGraphs } from "./graphs/p2-nucleus";
 import { electronicsGraphs } from "./graphs/p2-electronics";
 import { astroGraphs } from "./graphs/p2-astro";
+import { sscMotionGraphs } from "./graphs/ssc-motion";
+import { sscForceGraphs } from "./graphs/ssc-force";
+import { sscEnergyGraphs } from "./graphs/ssc-energy";
+import { sscPressureGraphs } from "./graphs/ssc-pressure";
+import { sscHeatGraphs } from "./graphs/ssc-heat";
+import { sscWaveGraphs } from "./graphs/ssc-wave";
+import { sscReflectGraphs } from "./graphs/ssc-reflect";
+import { sscRefractGraphs } from "./graphs/ssc-refract";
+import { sscStaticGraphs } from "./graphs/ssc-static";
+import { sscCurrentGraphs } from "./graphs/ssc-current";
+import { sscMagnetGraphs } from "./graphs/ssc-magnet";
+import { sscModernGraphs } from "./graphs/ssc-modern";
 import type { GraphSpec } from "./types";
 
 export const graphs: GraphSpec[] = [
@@ -43,6 +55,18 @@ export const graphs: GraphSpec[] = [
   ...nucleusGraphs,
   ...electronicsGraphs,
   ...astroGraphs,
+  ...sscMotionGraphs,
+  ...sscForceGraphs,
+  ...sscEnergyGraphs,
+  ...sscPressureGraphs,
+  ...sscHeatGraphs,
+  ...sscWaveGraphs,
+  ...sscReflectGraphs,
+  ...sscRefractGraphs,
+  ...sscStaticGraphs,
+  ...sscCurrentGraphs,
+  ...sscMagnetGraphs,
+  ...sscModernGraphs,
 ];
 
 export function graphsFor(chapter: string) {

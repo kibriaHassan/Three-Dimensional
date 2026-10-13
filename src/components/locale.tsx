@@ -128,6 +128,18 @@ export const sscChapterEn: Record<string, string> = {
   light: "Light",
   electro: "Electricity",
   modern: "Radioactivity",
+  "ssc-motion": "Motion",
+  "ssc-force": "Force",
+  "ssc-energy": "Work, power and energy",
+  "ssc-pressure": "States of matter and pressure",
+  "ssc-heat": "Heat and its effect",
+  "ssc-wave": "Waves and sound",
+  "ssc-reflect": "Reflection of light",
+  "ssc-refract": "Refraction of light",
+  "ssc-static": "Static electricity",
+  "ssc-current": "Current electricity",
+  "ssc-magnet": "Magnetic effect",
+  "ssc-modern": "Modern physics and electronics",
 };
 
 export const chapterEn: Record<string, string> = {
