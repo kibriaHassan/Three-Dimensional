@@ -6,6 +6,9 @@ export type Lang = "bn" | "en";
 
 const ui = {
   bn: {
+    graph: "গ্রাফ",
+    chapters: "অধ্যায়",
+    close: "বন্ধ",
     inter1: "HSC ১ম",
     inter2: "HSC ২য়",
     ssc: "এসএসসি",
@@ -57,6 +60,9 @@ const ui = {
     energyChapter: "কাজ, শক্তি ও ক্ষমতা",
   },
   en: {
+    graph: "Graph",
+    chapters: "Chapters",
+    close: "Close",
     inter1: "HSC 1st",
     inter2: "HSC 2nd",
     ssc: "SSC",
