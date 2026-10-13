@@ -93,14 +93,14 @@ export function GraphPlot({ curves, guides = [], xSymbol, ySymbol, fillArea, ori
 
   const points = curves.flatMap((item) => item.points);
   if (width === 0) {
-    return <div ref={setWrap} className="h-[320px] w-full min-w-0 rounded-2xl bg-[#fbfaf6]" />;
+    return <div ref={setWrap} className="h-[210px] w-full min-w-0 rounded-2xl bg-[#fbfaf6]" />;
   }
   if (points.length === 0) {
     return <p className="rounded-2xl bg-paper px-4 py-10 text-center text-sm text-muted">এই মানে বাস্তব লেখ নেই।</p>;
   }
 
-  const height = Math.round(Math.max(300, Math.min(430, width * 0.58)));
-  const pad = { l: width < 460 ? 70 : 86, r: 18, t: 18, b: 36 };
+  const height = Math.round(Math.max(188, Math.min(228, width * 0.42)));
+  const pad = { l: width < 460 ? 64 : 76, r: 14, t: 16, b: 32 };
   const includeX = origin === "x" || origin === "both";
   const includeY = origin === "y" || origin === "both" || Boolean(fillArea);
   const [x0, x1] = bounds(points.map((point) => point.x), includeX);
@@ -110,7 +110,7 @@ export function GraphPlot({ curves, guides = [], xSymbol, ySymbol, fillArea, ori
   const X = (x: number) => pad.l + ((x - x0) / (x1 - x0)) * plotW;
   const Y = (y: number) => pad.t + (1 - (y - y0) / (y1 - y0)) * plotH;
   const xTicks = tickMarks(x0, x1, width < 460 ? 4 : 5);
-  const yTicks = tickMarks(y0, y1, 5);
+  const yTicks = tickMarks(y0, y1, 4);
   const showX0 = x0 < 0 && x1 > 0;
   const showY0 = y0 < 0 && y1 > 0;
 
@@ -225,7 +225,7 @@ export function GraphPlot({ curves, guides = [], xSymbol, ySymbol, fillArea, ori
                 points={item.points.map((point) => `${X(point.x)},${Y(point.y)}`).join(" ")}
                 fill="none"
                 stroke={item.color}
-                strokeWidth={item.dashed ? 2 : 2.5}
+                strokeWidth={item.dashed ? 2 : 3}
                 strokeDasharray={item.dashed ? "7 6" : undefined}
                 strokeLinejoin="round"
                 strokeLinecap="round"

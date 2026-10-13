@@ -128,7 +128,7 @@ export function Studio() {
   return (
     <>
       <LabBackdrop />
-      <header className="sticky top-0 z-20 border-b border-line/70 bg-paper/90 backdrop-blur-md">
+      <header className="sticky top-0 z-20 border-b border-line/70 bg-paper/92 shadow-[inset_0_-3px_0_#c4623a] backdrop-blur-md">
         <div className="mx-auto flex max-w-6xl flex-wrap items-center justify-between gap-3 px-4 py-3 sm:px-5">
           <BrandLockup href="/" caption={t("tagline")} />
           <SiteBar active={board} onSelect={selectBoard} />
@@ -142,9 +142,9 @@ export function Studio() {
                 type="button"
                 aria-pressed={on}
                 onClick={() => selectChapter(item.id)}
-                className={`shrink-0 rounded-full border px-3 py-1.5 text-sm font-semibold ${on ? "border-ink bg-ink text-paper-2" : "border-line bg-white/70"}`}
+                className={`shrink-0 rounded-full px-3 py-1.5 text-sm font-semibold ${on ? "bg-ink text-paper-2 shadow-[3px_3px_0_#c4623a]" : "border border-line bg-white/80 text-ink"}`}
               >
-                {item.label} {lang === "bn" ? toBn(item.count) : item.count}
+                {item.label} <span className={on ? "text-[#f0d48a]" : "text-copper-deep"}>{lang === "bn" ? toBn(item.count) : item.count}</span>
               </button>
             );
           })}

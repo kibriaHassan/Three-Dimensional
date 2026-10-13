@@ -14,25 +14,36 @@ export function LandingHero({ onEnter }: { onEnter: (board: Board) => void }) {
   const { t } = useLang();
 
   return (
-    <section className="relative isolate mx-auto mt-4 min-h-[min(78dvh,680px)] max-w-6xl overflow-hidden rounded-[32px] bg-lab shadow-[0_24px_60px_rgba(16,22,29,0.18)]">
+    <section className="relative isolate mx-auto mt-2 min-h-[440px] max-w-6xl overflow-hidden rounded-[36px] bg-lab shadow-[8px_8px_0_#c4623a]">
       <Field />
-      <div className="pointer-events-none absolute inset-0 bg-gradient-to-r from-[#10161d]/88 via-[#10161d]/55 to-[#10161d]/20" />
-      <div className="relative z-10 flex min-h-[min(78dvh,680px)] flex-col justify-end px-5 py-8 sm:px-8 sm:py-10">
-        <p className="text-xs font-bold tracking-[0.16em] text-[#f0d48a]">{t("heroKicker")}</p>
-        <h1 className="mt-3 max-w-full font-sans text-4xl font-extrabold leading-none tracking-tight text-[#f6f1e6] sm:text-6xl lg:text-7xl">
-          <span className="text-copper">3d</span>sciencezone
-        </h1>
-        <p className="mt-4 max-w-xl text-sm leading-relaxed text-white/80 sm:text-lg">{t("heroLead")}</p>
-        <div className="mt-6 grid gap-3 sm:grid-cols-3">
-          {zones.map((zone) => (
+      <div className="pointer-events-none absolute inset-0 bg-[linear-gradient(115deg,rgba(8,12,14,0.88)_0%,rgba(8,12,14,0.5)_52%,rgba(8,12,14,0.22)_100%)]" />
+      <div className="relative z-10 grid min-h-[440px] items-center gap-6 px-5 py-6 sm:px-8 lg:grid-cols-[minmax(0,1.15fr)_minmax(16rem,0.85fr)]">
+        <div>
+          <p className="inline-flex items-center gap-2 text-[11px] font-bold tracking-[0.22em] text-[#f0d48a] uppercase">
+            <span className="h-px w-8 bg-[#f0d48a]" />
+            {t("heroKicker")}
+          </p>
+          <h1 className="mt-4 max-w-full font-sans text-4xl font-extrabold leading-[0.9] tracking-tight text-[#f6f1e6] sm:text-6xl">
+            <span className="text-copper">3d</span>sciencezone
+          </h1>
+          <p className="mt-5 max-w-md border-l-2 border-copper pl-4 text-sm leading-relaxed text-white/80 sm:text-base">{t("heroLead")}</p>
+        </div>
+        <div className="grid gap-2.5">
+          {zones.map((zone, index) => (
             <button
               key={zone.board}
               type="button"
               onClick={() => onEnter(zone.board)}
-              className="rounded-3xl border border-white/15 bg-white/10 px-4 py-4 text-left text-[#f6f1e6] backdrop-blur-md transition hover:border-white/30 hover:bg-white/16"
+              className="group grid grid-cols-[auto_minmax(0,1fr)_auto] items-center gap-3 rounded-2xl border border-white/15 bg-[#10161d]/55 px-3 py-3 text-left text-[#f6f1e6] backdrop-blur-md transition hover:border-[#f0d48a]/70 hover:bg-[#10161d]/75"
             >
-              <span className="block font-serif text-2xl leading-tight">{t(zone.title)}</span>
-              <span className="mt-1 block text-sm leading-relaxed text-white/75">{t(zone.text)}</span>
+              <span className="grid h-10 w-10 place-items-center rounded-xl bg-[#f0d48a] font-serif text-lg text-ink">{index + 1}</span>
+              <span>
+                <span className="block font-serif text-xl leading-tight">{t(zone.title)}</span>
+                <span className="mt-0.5 block text-xs leading-relaxed text-white/70">{t(zone.text)}</span>
+              </span>
+              <span className="text-lg text-[#f0d48a] transition group-hover:translate-x-0.5" aria-hidden="true">
+                →
+              </span>
             </button>
           ))}
         </div>

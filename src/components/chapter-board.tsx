@@ -142,7 +142,7 @@ export function ChapterBoard({
               <Link
                 key={model.slug}
                 href={`/vector/${model.slug}`}
-                className="flex flex-col overflow-hidden rounded-3xl border border-line bg-white text-ink no-underline shadow-sm transition duration-200 hover:-translate-y-1 hover:shadow-[0_18px_40px_rgba(20,33,28,0.1)]"
+                className="flex flex-col overflow-hidden rounded-3xl border border-line bg-white text-ink no-underline shadow-[5px_5px_0_rgba(196,98,58,0.28)] transition duration-200 hover:-translate-y-1 hover:shadow-[7px_7px_0_#c4623a]"
               >
                 <span className="grid h-32 place-items-center overflow-hidden bg-[#152028] px-5 text-[#f3eadc] sm:h-36">
                   <CardMotion kind="vector" name={model.slug} />
@@ -164,7 +164,7 @@ export function ChapterBoard({
               <Link
                 key={`wave-${model.slug}`}
                 href={`/wave/${model.slug}`}
-                className="flex flex-col overflow-hidden rounded-3xl border border-line bg-white text-ink no-underline shadow-sm transition duration-200 hover:-translate-y-1 hover:shadow-[0_18px_40px_rgba(20,33,28,0.1)]"
+                className="flex flex-col overflow-hidden rounded-3xl border border-line bg-white text-ink no-underline shadow-[5px_5px_0_rgba(196,98,58,0.28)] transition duration-200 hover:-translate-y-1 hover:shadow-[7px_7px_0_#c4623a]"
               >
                 <span className="grid h-32 place-items-center overflow-hidden bg-[#152028] px-5 text-[#f3eadc] sm:h-36">
                   <CardMotion kind="wave" name={model.family} />
@@ -186,7 +186,7 @@ export function ChapterBoard({
               <Link
                 key={model.slug}
                 href={`/optics/${model.slug}`}
-                className="flex flex-col overflow-hidden rounded-3xl border border-line bg-white text-ink no-underline shadow-sm transition duration-200 hover:-translate-y-1 hover:shadow-[0_18px_40px_rgba(20,33,28,0.1)]"
+                className="flex flex-col overflow-hidden rounded-3xl border border-line bg-white text-ink no-underline shadow-[5px_5px_0_rgba(196,98,58,0.28)] transition duration-200 hover:-translate-y-1 hover:shadow-[7px_7px_0_#c4623a]"
               >
                 <span className="grid h-32 place-items-center overflow-hidden bg-[#152028] px-5 text-[#f3eadc] sm:h-36">
                   <CardMotion kind="optics" name={model.family} />
@@ -208,7 +208,7 @@ export function ChapterBoard({
               <Link
                 key={`energy-${model.slug}`}
                 href={`/energy/${model.slug}`}
-                className="flex flex-col overflow-hidden rounded-3xl border border-line bg-white text-ink no-underline shadow-sm transition duration-200 hover:-translate-y-1 hover:shadow-[0_18px_40px_rgba(20,33,28,0.1)]"
+                className="flex flex-col overflow-hidden rounded-3xl border border-line bg-white text-ink no-underline shadow-[5px_5px_0_rgba(196,98,58,0.28)] transition duration-200 hover:-translate-y-1 hover:shadow-[7px_7px_0_#c4623a]"
               >
                 <span className="grid h-32 place-items-center overflow-hidden bg-[#152028] px-5 text-[#f3eadc] sm:h-36">
                   <CardMotion kind="energy" name={model.family} />
@@ -230,7 +230,7 @@ export function ChapterBoard({
               <Link
                 key={`thermo-${model.slug}`}
                 href={`/thermo/${model.slug}`}
-                className="flex flex-col overflow-hidden rounded-3xl border border-line bg-white text-ink no-underline shadow-sm transition duration-200 hover:-translate-y-1 hover:shadow-[0_18px_40px_rgba(20,33,28,0.1)]"
+                className="flex flex-col overflow-hidden rounded-3xl border border-line bg-white text-ink no-underline shadow-[5px_5px_0_rgba(196,98,58,0.28)] transition duration-200 hover:-translate-y-1 hover:shadow-[7px_7px_0_#c4623a]"
               >
                 <span className="grid h-32 place-items-center overflow-hidden bg-[#152028] px-5 text-[#f3eadc] sm:h-36">
                   <CardMotion kind="thermo" name={model.family} />
@@ -250,7 +250,7 @@ export function ChapterBoard({
               key={demo.id}
               type="button"
               onClick={() => onOpen(demo.id)}
-              className="flex flex-col overflow-hidden rounded-3xl border border-line bg-white text-left shadow-sm transition duration-200 hover:-translate-y-1 hover:shadow-[0_18px_40px_rgba(20,33,28,0.1)]"
+              className="flex flex-col overflow-hidden rounded-3xl border border-line bg-white text-left shadow-[5px_5px_0_rgba(196,98,58,0.28)] transition duration-200 hover:-translate-y-1 hover:shadow-[7px_7px_0_#c4623a]"
             >
               <span
                 className="grid h-32 place-items-center bg-[#152028] px-6 text-[#f3eadc] sm:h-36 [&_svg]:h-full [&_svg]:w-full"

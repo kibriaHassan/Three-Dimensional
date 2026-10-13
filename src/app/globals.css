@@ -17,6 +17,11 @@ html {
   scroll-behavior: smooth;
 }
 
+.drawer-scroll {
+  scrollbar-width: thin;
+  scrollbar-color: #c4623a transparent;
+}
+
 body {
   position: relative;
   z-index: 0;
