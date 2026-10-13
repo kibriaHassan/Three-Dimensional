@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
 import { createPortal } from "react-dom";
 import { chapters as sscChapters } from "@/lab/scenes/index";
@@ -15,10 +16,15 @@ const sscList = (sscChapters as Chapter[]).filter((item) => item.id !== "all");
 
 export function SiteBar({ active, onSelect }: { active?: Board; onSelect?: (board: Board) => void }) {
   const { lang, t, toggleLang } = useLang();
+  const path = usePathname() ?? "";
   const label = { "paper-1": t("inter1"), "paper-2": t("inter2"), ssc: t("ssc") };
   const [open, setOpen] = useState(false);
   const [picked, setPicked] = useState<string | null>(null);
   const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setOpen(false);
+  }, [path]);
 
   useEffect(() => {
     setMounted(true);
@@ -95,17 +101,29 @@ export function SiteBar({ active, onSelect }: { active?: Board; onSelect?: (boar
               <ul className="mt-2 grid gap-1">
                 {group.items.map((item) => {
                   const key = `${group.id}:${item.id}`;
-                  const on = picked === key;
+                  const current = group.id === "paper-1" && path === `/graph/${item.id}`;
+                  const on = current || picked === key;
                   return (
                     <li key={key}>
-                      <button
-                        type="button"
-                        aria-pressed={on}
-                        onClick={() => setPicked(key)}
-                        className={`w-full rounded-2xl px-3 py-2.5 text-left text-sm font-semibold ${on ? "bg-ink text-paper-2" : "text-ink hover:bg-white"}`}
-                      >
-                        {item.label}
-                      </button>
+                      {group.id === "paper-1" ? (
+                        <Link
+                          href={`/graph/${item.id}`}
+                          aria-current={current ? "page" : undefined}
+                          onClick={() => setOpen(false)}
+                          className={`block w-full rounded-2xl px-3 py-2.5 text-left text-sm font-semibold no-underline ${on ? "bg-ink text-paper-2" : "text-ink hover:bg-white"}`}
+                        >
+                          {item.label}
+                        </Link>
+                      ) : (
+                        <button
+                          type="button"
+                          aria-pressed={on}
+                          onClick={() => setPicked(key)}
+                          className={`w-full rounded-2xl px-3 py-2.5 text-left text-sm font-semibold ${on ? "bg-ink text-paper-2" : "text-ink hover:bg-white"}`}
+                        >
+                          {item.label}
+                        </button>
+                      )}
                     </li>
                   );
                 })}
@@ -125,7 +143,7 @@ export function SiteBar({ active, onSelect }: { active?: Board; onSelect?: (boar
         aria-expanded={open}
         aria-controls="graph-drawer"
         onClick={() => setOpen(true)}
-        className={`rounded-full px-2.5 py-1.5 text-xs font-bold sm:px-3 sm:text-sm ${open ? "bg-ink text-paper-2" : "border border-line bg-white/80 text-ink"}`}
+        className={`rounded-full px-2.5 py-1.5 text-xs font-bold sm:px-3 sm:text-sm ${mounted && (open || path.startsWith("/graph")) ? "bg-ink text-paper-2" : "border border-line bg-white/80 text-ink"}`}
       >
         {t("graph")}
       </button>
