@@ -52,7 +52,9 @@ export type GraphSpec = {
   area: string;
   fillArea?: boolean;
   origin?: "x" | "y" | "both";
+  flipX?: boolean;
   animate?: boolean;
+  steps?: { eq: string; why: string; tag?: string }[];
   knobs: Knob[];
   base: Record<string, number>;
   build: (p: Record<string, number>, time: number) => GraphView;

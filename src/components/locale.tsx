@@ -152,6 +152,7 @@ export const chapterEn: Record<string, string> = {
   modern: "Modern physics",
   nucleus: "Atoms and nuclei",
   electronics: "Electronics",
+  astro: "Astronomy",
 };
 
 export const demoEn: Record<string, string> = {

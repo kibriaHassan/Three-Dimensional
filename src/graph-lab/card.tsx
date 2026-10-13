@@ -68,6 +68,7 @@ export function GraphCard({ spec, index }: { spec: GraphSpec; index: number }) {
   }, [playing]);
 
   const live = spec.build(params, time);
+  const steps = spec.steps ?? derivations[spec.id];
   const curves: Curve[] = [];
   if (compare) {
     const baseView = spec.build(spec.base, 0);
@@ -126,6 +127,7 @@ export function GraphCard({ spec, index }: { spec: GraphSpec; index: number }) {
               ySymbol={spec.ySymbol}
               fillArea={spec.fillArea}
               origin={spec.origin}
+              flipX={spec.flipX}
               label={`${spec.yName} বনাম ${spec.xName}. ${spec.formula}`}
               marker={pick}
               onPick={setPick}
@@ -186,7 +188,7 @@ export function GraphCard({ spec, index }: { spec: GraphSpec; index: number }) {
           </div>
         </div>
         <div className="grid content-start gap-2">
-        {derivations[spec.id] ? <DerivePath steps={derivations[spec.id]} /> : null}
+        {steps ? <DerivePath steps={steps} /> : null}
         <dl className="grid content-start gap-2 text-sm leading-relaxed">
           <div className="rounded-2xl bg-[#10161d] px-3 py-2 text-[#f6f1e6]">
             <dt className="text-[11px] font-bold tracking-wide text-[#f0d48a]">হিসাব</dt>

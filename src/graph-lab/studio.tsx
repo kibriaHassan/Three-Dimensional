@@ -22,7 +22,10 @@ export function GraphStudio({ chapter }: { chapter: string }) {
   const { lang, t } = useLang();
   const [query, setQuery] = useState("");
   const [filter, setFilter] = useState<(typeof filters)[number]["id"]>("all");
-  const chapters = interPapers[0].chapters;
+  const paper = interPapers.find((item) => item.chapters.some((entry) => entry.id === chapter)) ?? interPapers[0];
+  const chapters = paper.chapters;
+  const paperShort = paper.id === "paper-2" ? "HSC ২য়" : "HSC ১ম";
+  const paperLong = paper.id === "paper-2" ? "HSC ২য় পত্র" : "HSC ১ম পত্র";
   const current = chapters.find((item) => item.id === chapter);
   const all = graphsFor(chapter);
 
@@ -40,13 +43,13 @@ export function GraphStudio({ chapter }: { chapter: string }) {
       <header className="sticky top-0 z-20 border-b border-line/80 bg-paper/92 shadow-[inset_0_-3px_0_#c4623a] backdrop-blur-md">
         <div className="mx-auto flex max-w-6xl flex-wrap items-center justify-between gap-3 px-4 py-3 sm:px-5">
           <BrandLockup href="/" caption={t("graph")} />
-          <SiteBar active="paper-1" />
+          <SiteBar active={paper.id} />
         </div>
       </header>
       <div className="mx-auto grid max-w-6xl gap-6 px-4 py-5 sm:px-5 lg:grid-cols-[15.5rem_minmax(0,1fr)] lg:py-8">
         <aside className="hidden lg:block">
-          <div className="sticky top-20 rounded-[28px] bg-[#10161d] p-3 text-[#f6f1e6] shadow-[6px_6px_0_#c4623a]">
-            <p className="px-2 text-[11px] font-bold tracking-[0.16em] text-[#f0d48a]">HSC ১ম</p>
+          <div className="sticky top-20 max-h-[calc(100dvh-6rem)] overflow-y-auto rounded-[28px] bg-[#10161d] p-3 text-[#f6f1e6] shadow-[6px_6px_0_#c4623a]">
+            <p className="px-2 text-[11px] font-bold tracking-[0.16em] text-[#f0d48a]">{paperShort}</p>
             <h2 className="px-2 font-serif text-2xl">{t("chapters")}</h2>
             <ul className="mt-2 grid gap-1">
               {chapters.map((item, index) => {
@@ -87,7 +90,7 @@ export function GraphStudio({ chapter }: { chapter: string }) {
           </nav>
           {current ? (
             <>
-              <p className="text-xs font-bold tracking-[0.14em] text-copper-deep">HSC ১ম পত্র · {t("graph")}</p>
+              <p className="text-xs font-bold tracking-[0.14em] text-copper-deep">{paperLong} · {t("graph")}</p>
               <h1 className="mt-1 font-serif text-3xl leading-tight sm:text-4xl">{current.title}</h1>
               <p className="mt-2 max-w-2xl text-sm leading-relaxed text-muted sm:text-base">{current.blurb}</p>
               <div className="mt-4 flex flex-col gap-3 sm:flex-row sm:items-center">
@@ -125,7 +128,7 @@ export function GraphStudio({ chapter }: { chapter: string }) {
           ) : (
             <>
               <h1 className="font-serif text-4xl">এই অধ্যায়ের গ্রাফ নেই</h1>
-              <p className="mt-3 max-w-xl text-sm leading-relaxed text-muted">HSC ১ম পত্রের দশটি অধ্যায়ের গ্রাফ আছে। ওপরের তালিকা থেকে একটি অধ্যায় খোলো।</p>
+              <p className="mt-3 max-w-xl text-sm leading-relaxed text-muted">HSC ১ম ও ২য় পত্রের অধ্যায়ের গ্রাফ আছে। তালিকা থেকে একটি অধ্যায় খোলো।</p>
             </>
           )}
         </main>

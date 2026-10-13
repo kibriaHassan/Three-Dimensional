@@ -3,6 +3,14 @@ import type { Curve, Knob, Point } from "./types";
 export const G_ACC = 9.8;
 export const R_EARTH = 6.371e6;
 export const GAS_R = 8.314;
+export const K_COULOMB = 9e9;
+export const EPS0 = 8.854e-12;
+export const MU0 = Math.PI * 4e-7;
+export const PLANCK = 6.62607015e-34;
+export const PLANCK_EV = 4.135667696e-15;
+export const ELECTRON = 1.602176634e-19;
+export const ELECTRON_MASS = 9.1093837e-31;
+export const EV_PER_U = 931.494;
 
 export const copper = "#c4623a";
 export const green = "#1f7a62";

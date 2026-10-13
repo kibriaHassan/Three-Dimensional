@@ -11,6 +11,7 @@ type Props = {
   ySymbol: string;
   fillArea?: boolean;
   origin?: "x" | "y" | "both";
+  flipX?: boolean;
   label: string;
   marker: Probe | null;
   onPick: (probe: Probe) => void;
@@ -67,7 +68,7 @@ function slopeAt(points: Point[], index: number) {
   return (points[i].y - points[i - 1].y) / dx;
 }
 
-export function GraphPlot({ curves, guides = [], xSymbol, ySymbol, fillArea, origin, label, marker, onPick }: Props) {
+export function GraphPlot({ curves, guides = [], xSymbol, ySymbol, fillArea, origin, flipX, label, marker, onPick }: Props) {
   const wrap = useRef<HTMLDivElement | null>(null);
   const observer = useRef<ResizeObserver | null>(null);
   const [width, setWidth] = useState(0);
@@ -107,7 +108,10 @@ export function GraphPlot({ curves, guides = [], xSymbol, ySymbol, fillArea, ori
   const [y0, y1] = bounds(points.map((point) => point.y), includeY);
   const plotW = width - pad.l - pad.r;
   const plotH = height - pad.t - pad.b;
-  const X = (x: number) => pad.l + ((x - x0) / (x1 - x0)) * plotW;
+  const X = (x: number) => {
+    const t = (x - x0) / (x1 - x0);
+    return pad.l + (flipX ? 1 - t : t) * plotW;
+  };
   const Y = (y: number) => pad.t + (1 - (y - y0) / (y1 - y0)) * plotH;
   const xTicks = tickMarks(x0, x1, width < 460 ? 4 : 5);
   const yTicks = tickMarks(y0, y1, 4);

@@ -105,13 +105,14 @@ export function SiteBar({ active, onSelect }: { active?: Board; onSelect?: (boar
               <ul className="mt-2 grid gap-1">
                 {group.items.map((item, index) => {
                   const key = `${group.id}:${item.id}`;
-                  const current = group.id === "paper-1" && path === `/graph/${item.id}`;
+                  const linked = group.id === "paper-1" || group.id === "paper-2";
+                  const current = linked && path === `/graph/${item.id}`;
                   const on = current || picked === key;
                   const row = `grid w-full grid-cols-[2.2rem_minmax(0,1fr)] items-center gap-1 rounded-2xl px-2 py-2 text-left text-sm font-semibold ${on ? "bg-[#f6f1e6] text-ink" : "text-[#f6f1e6] hover:bg-white/8"}`;
                   const mark = <span className={`font-serif ${on ? "text-copper-deep" : "text-[#f0d48a]"}`}>{toBn(index + 1)}</span>;
                   return (
                     <li key={key}>
-                      {group.id === "paper-1" ? (
+                      {linked ? (
                         <Link href={`/graph/${item.id}`} aria-current={current ? "page" : undefined} onClick={() => setOpen(false)} className={`${row} no-underline`}>
                           {mark}
                           <span>{item.label}</span>
