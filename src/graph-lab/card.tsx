@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { toBn } from "@/vector-lab/math";
+import { derivations, type DeriveStep } from "./derive";
 import { bnNum } from "./format";
 import { GraphPlot } from "./plot";
 import type { Curve, GraphSpec, Probe } from "./types";
@@ -11,6 +12,32 @@ const sourceLabel = {
   extra: "সূত্রভিত্তিক অতিরিক্ত গ্রাফ",
   schematic: "পাঠ্যবইয়ের নকশা",
 } as const;
+
+function DerivePath({ steps }: { steps: DeriveStep[] }) {
+  return (
+    <div className="derive-path rounded-[22px] border border-[#1c2a24] bg-[#fbf7ef] px-3 py-3">
+      <p className="text-[11px] font-bold tracking-[0.14em] text-copper-deep">মূল সূত্র থেকে এই লেখ</p>
+      <ol className="mt-3">
+        {steps.map((step, index) => {
+          const last = index === steps.length - 1;
+          return (
+            <li key={`${step.eq}-${index}`} className="grid grid-cols-[1.35rem_minmax(0,1fr)] gap-2">
+              <span className="relative flex justify-center">
+                <span className="z-10 grid h-5 w-5 place-items-center rounded-full bg-[#10161d] font-serif text-[10px] text-[#f0d48a]">{toBn(index + 1)}</span>
+                {last ? null : <span className="absolute top-5 bottom-0 w-px bg-copper/70" />}
+              </span>
+              <div className={last ? "" : "pb-3"}>
+                <p className="font-serif text-[15px] leading-snug break-words text-ink">{step.eq}</p>
+                {step.tag ? <p className="mt-1 inline-block rounded-full bg-[#10161d] px-2 py-0.5 text-[10px] font-bold tracking-wide text-[#f0d48a]">{step.tag}</p> : null}
+                <p className="mt-1 text-xs leading-relaxed text-muted">{step.why}</p>
+              </div>
+            </li>
+          );
+        })}
+      </ol>
+    </div>
+  );
+}
 
 function digitsOf(step: number) {
   if (step >= 1) return 0;
@@ -158,6 +185,8 @@ export function GraphCard({ spec, index }: { spec: GraphSpec; index: number }) {
             ) : null}
           </div>
         </div>
+        <div className="grid content-start gap-2">
+        {derivations[spec.id] ? <DerivePath steps={derivations[spec.id]} /> : null}
         <dl className="grid content-start gap-2 text-sm leading-relaxed">
           <div className="rounded-2xl bg-[#10161d] px-3 py-2 text-[#f6f1e6]">
             <dt className="text-[11px] font-bold tracking-wide text-[#f0d48a]">হিসাব</dt>
@@ -186,6 +215,7 @@ export function GraphCard({ spec, index }: { spec: GraphSpec; index: number }) {
             <dd>{spec.meaning}</dd>
           </div>
         </dl>
+        </div>
       </div>
     </section>
   );
