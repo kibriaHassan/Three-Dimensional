@@ -9,6 +9,10 @@ import type { Demo } from "@/lib/types";
 import { opticsModels, sectionLabel } from "@/optics-lab/catalog";
 import { vectorModels } from "@/vector-lab/catalog";
 import { energyModels, energySection } from "@/energy-lab/catalog";
+import { gravityModels, gravitySection } from "@/gravity-lab/catalog";
+import { newtonModels, newtonSection } from "@/newton-lab/catalog";
+import { dynamicsModels, dynamicsSection } from "@/dynamics-lab/catalog";
+import { matterModels, matterSection } from "@/matter-lab/catalog";
 import { thermoModels, thermoSection } from "@/thermo-lab/catalog";
 import { sectionLabel as waveSection, waveModels } from "@/wave-lab/catalog";
 import { CardMotion } from "./card-motion";
@@ -47,7 +51,11 @@ export function interCount(paperId: Board, chapterId: string) {
   const waves = chapters.some((chapter) => chapter.id === "wave") ? waveModels.length : 0;
   const thermo = chapters.some((chapter) => chapter.id === "thermo") ? thermoModels.length : 0;
   const energy = chapters.some((chapter) => chapter.id === "energy") ? energyModels.length : 0;
-  return scenes + vectors + optics + waves + thermo + energy;
+  const matter = chapters.some((chapter) => chapter.id === "matter") ? matterModels.length : 0;
+  const gravity = chapters.some((chapter) => chapter.id === "gravity") ? gravityModels.length : 0;
+  const newton = chapters.some((chapter) => chapter.id === "newton") ? newtonModels.length : 0;
+  const dynamics = chapters.some((chapter) => chapter.id === "dynamics") ? dynamicsModels.length : 0;
+  return scenes + vectors + optics + waves + thermo + energy + matter + gravity + newton + dynamics;
 }
 
 export function ChapterBoard({
@@ -95,6 +103,34 @@ export function ChapterBoard({
       })
     : [];
 
+  const matter = selected.some((chapter) => chapter.id === "matter")
+    ? matterModels.filter((model) => {
+        if (!q) return true;
+        return `${model.title} ${model.blurb} ${model.titleEn} ${model.blurbEn}`.toLowerCase().includes(q);
+      })
+    : [];
+
+  const gravity = selected.some((chapter) => chapter.id === "gravity")
+    ? gravityModels.filter((model) => {
+        if (!q) return true;
+        return `${model.title} ${model.blurb} ${model.titleEn} ${model.blurbEn}`.toLowerCase().includes(q);
+      })
+    : [];
+
+  const newton = selected.some((chapter) => chapter.id === "newton")
+    ? newtonModels.filter((model) => {
+        if (!q) return true;
+        return `${model.title} ${model.blurb} ${model.titleEn} ${model.blurbEn}`.toLowerCase().includes(q);
+      })
+    : [];
+
+  const dynamics = selected.some((chapter) => chapter.id === "dynamics")
+    ? dynamicsModels.filter((model) => {
+        if (!q) return true;
+        return `${model.title} ${model.blurb} ${model.titleEn} ${model.blurbEn}`.toLowerCase().includes(q);
+      })
+    : [];
+
   const thermo = selected.some((chapter) => chapter.id === "thermo")
     ? thermoModels.filter((model) => {
         if (!q) return true;
@@ -113,7 +149,7 @@ export function ChapterBoard({
   );
 
   const chapter = paper.chapters.find((item) => item.id === chapterId);
-  const empty = models.length === 0 && optics.length === 0 && waves.length === 0 && thermo.length === 0 && energy.length === 0 && demos.length === 0;
+  const empty = models.length === 0 && optics.length === 0 && waves.length === 0 && thermo.length === 0 && energy.length === 0 && matter.length === 0 && gravity.length === 0 && newton.length === 0 && dynamics.length === 0 && demos.length === 0;
 
   return (
     <div>
@@ -215,6 +251,94 @@ export function ChapterBoard({
                 </span>
                 <span className="flex flex-1 flex-col gap-2 p-4">
                   <span className="text-xs font-bold text-copper-deep">{energySection(model.section, lang)}</span>
+                  {serialTitle(model.no, title, lang)}
+                  <span className="font-serif text-lg text-copper-deep">{model.formula}</span>
+                  <span className="flex-1 text-sm leading-relaxed text-muted">{blurb}</span>
+                  <span className="text-sm font-bold">{t("open")} →</span>
+                </span>
+              </Link>
+            );
+          })}
+          {matter.map((model) => {
+            const title = lang === "en" ? model.titleEn : model.title;
+            const blurb = lang === "en" ? model.blurbEn : model.blurb;
+            return (
+              <Link
+                key={`matter-${model.slug}`}
+                href={`/matter/${model.slug}`}
+                className="flex flex-col overflow-hidden rounded-3xl border border-line bg-white text-ink no-underline shadow-[5px_5px_0_rgba(196,98,58,0.28)] transition duration-200 hover:-translate-y-1 hover:shadow-[7px_7px_0_#c4623a]"
+              >
+                <span className="grid h-32 place-items-center overflow-hidden bg-[#152028] px-5 text-[#f3eadc] sm:h-36">
+                  <CardMotion kind="matter" name={model.family} />
+                </span>
+                <span className="flex flex-1 flex-col gap-2 p-4">
+                  <span className="text-xs font-bold text-copper-deep">{matterSection(model.section, lang)}</span>
+                  {serialTitle(model.no, title, lang)}
+                  <span className="font-serif text-lg text-copper-deep">{model.formula}</span>
+                  <span className="flex-1 text-sm leading-relaxed text-muted">{blurb}</span>
+                  <span className="text-sm font-bold">{t("open")} →</span>
+                </span>
+              </Link>
+            );
+          })}
+          {dynamics.map((model) => {
+            const title = lang === "en" ? model.titleEn : model.title;
+            const blurb = lang === "en" ? model.blurbEn : model.blurb;
+            return (
+              <Link
+                key={`dynamics-${model.slug}`}
+                href={`/dynamics/${model.slug}`}
+                className="flex flex-col overflow-hidden rounded-3xl border border-line bg-white text-ink no-underline shadow-[5px_5px_0_rgba(196,98,58,0.28)] transition duration-200 hover:-translate-y-1 hover:shadow-[7px_7px_0_#c4623a]"
+              >
+                <span className="grid h-32 place-items-center overflow-hidden bg-[#152028] px-5 text-[#f3eadc] sm:h-36">
+                  <CardMotion kind="dynamics" name={model.family} />
+                </span>
+                <span className="flex flex-1 flex-col gap-2 p-4">
+                  <span className="text-xs font-bold text-copper-deep">{dynamicsSection(model.section, lang)}</span>
+                  {serialTitle(model.no, title, lang)}
+                  <span className="font-serif text-lg text-copper-deep">{model.formula}</span>
+                  <span className="flex-1 text-sm leading-relaxed text-muted">{blurb}</span>
+                  <span className="text-sm font-bold">{t("open")} →</span>
+                </span>
+              </Link>
+            );
+          })}
+          {newton.map((model) => {
+            const title = lang === "en" ? model.titleEn : model.title;
+            const blurb = lang === "en" ? model.blurbEn : model.blurb;
+            return (
+              <Link
+                key={`newton-${model.slug}`}
+                href={`/newton/${model.slug}`}
+                className="flex flex-col overflow-hidden rounded-3xl border border-line bg-white text-ink no-underline shadow-[5px_5px_0_rgba(196,98,58,0.28)] transition duration-200 hover:-translate-y-1 hover:shadow-[7px_7px_0_#c4623a]"
+              >
+                <span className="grid h-32 place-items-center overflow-hidden bg-[#152028] px-5 text-[#f3eadc] sm:h-36">
+                  <CardMotion kind="newton" name={model.family} />
+                </span>
+                <span className="flex flex-1 flex-col gap-2 p-4">
+                  <span className="text-xs font-bold text-copper-deep">{newtonSection(model.section, lang)}</span>
+                  {serialTitle(model.no, title, lang)}
+                  <span className="font-serif text-lg text-copper-deep">{model.formula}</span>
+                  <span className="flex-1 text-sm leading-relaxed text-muted">{blurb}</span>
+                  <span className="text-sm font-bold">{t("open")} →</span>
+                </span>
+              </Link>
+            );
+          })}
+          {gravity.map((model) => {
+            const title = lang === "en" ? model.titleEn : model.title;
+            const blurb = lang === "en" ? model.blurbEn : model.blurb;
+            return (
+              <Link
+                key={`gravity-${model.slug}`}
+                href={`/gravity/${model.slug}`}
+                className="flex flex-col overflow-hidden rounded-3xl border border-line bg-white text-ink no-underline shadow-[5px_5px_0_rgba(196,98,58,0.28)] transition duration-200 hover:-translate-y-1 hover:shadow-[7px_7px_0_#c4623a]"
+              >
+                <span className="grid h-32 place-items-center overflow-hidden bg-[#152028] px-5 text-[#f3eadc] sm:h-36">
+                  <CardMotion kind="gravity" name={model.family} />
+                </span>
+                <span className="flex flex-1 flex-col gap-2 p-4">
+                  <span className="text-xs font-bold text-copper-deep">{gravitySection(model.section, lang)}</span>
                   {serialTitle(model.no, title, lang)}
                   <span className="font-serif text-lg text-copper-deep">{model.formula}</span>
                   <span className="flex-1 text-sm leading-relaxed text-muted">{blurb}</span>

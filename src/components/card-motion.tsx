@@ -2,7 +2,7 @@
 
 import { useId, type ReactNode } from "react";
 
-type Kind = "vector" | "wave" | "optics" | "thermo" | "energy";
+type Kind = "vector" | "wave" | "optics" | "thermo" | "energy" | "matter" | "gravity" | "newton" | "dynamics";
 
 const WAVE = "M-80 52 C-60 22 -40 22 -20 52 S20 82 40 52 S80 22 100 52 S140 82 160 52 S200 22 220 52 S260 82 280 52";
 
@@ -402,9 +402,190 @@ function energyArt(family: string): ReactNode {
   );
 }
 
+function dynamicsArt(family: string): ReactNode {
+  if (family === "path") {
+    return (
+      <>
+        <path d="M24 72 H90 V28" />
+        <path d="M24 72 L90 28" stroke="#e7a15a" />
+        <circle cx="90" cy="28" r="5" fill="#8fd0ef" stroke="none" />
+      </>
+    );
+  }
+  if (family === "graphs") {
+    return (
+      <>
+        <path d="M22 18 V82 H150" />
+        <path d="M28 70 Q70 66 120 28" stroke="#e7a15a" />
+        <path d="M28 74 L120 40" stroke="#8fd0ef" />
+      </>
+    );
+  }
+  if (family === "vertical") {
+    return (
+      <>
+        <path d="M48 16 V84" />
+        <path d="M36 84 H96" />
+        <circle className="bob" cx="48" cy="28" r="6" fill="#f2d48a" stroke="none" />
+        <path d="M70 24 V58" stroke="#e7a15a" />
+      </>
+    );
+  }
+  if (family === "shot") {
+    return (
+      <>
+        <path d="M16 78 H146" />
+        <path d="M24 78 Q70 16 132 78" stroke="#8fd0ef" />
+        <path d="M24 78 Q78 28 132 78" stroke="#f6f1e6" opacity="0.55" />
+      </>
+    );
+  }
+  return (
+    <>
+      <path d="M16 72 H146" />
+      <rect className="slide-short" x="48" y="50" width="28" height="16" />
+      <path d="M80 58 H118" stroke="#e7a15a" />
+    </>
+  );
+}
+
+function newtonArt(family: string): ReactNode {
+  if (family === "friction" || family === "laws") {
+    return (
+      <>
+        <path d="M16 78 H146" />
+        <rect x="48" y="52" width="28" height="22" />
+        <path d="M80 62 H112" stroke="#e7a15a" />
+        <path d="M104 56 L112 62 L104 68" stroke="#e7a15a" />
+      </>
+    );
+  }
+  if (family === "circle" || family === "shot") {
+    return (
+      <>
+        <circle cx="70" cy="58" r="8" />
+        <path d="M78 58 H118" stroke="#8fd0ef" />
+        <path d="M24 78 Q70 18 132 78" stroke="#e7a15a" />
+      </>
+    );
+  }
+  return (
+    <>
+      <rect x="28" y="48" width="26" height="18" />
+      <rect x="108" y="42" width="30" height="24" />
+      <path d="M58 56 H78" stroke="#e7a15a" />
+      <path d="M96 56 H108" stroke="#8fd0ef" />
+    </>
+  );
+}
+
+function gravityArt(family: string): ReactNode {
+  if (family === "attract" || family === "trio") {
+    return (
+      <>
+        <circle cx="48" cy="58" r="14" />
+        <circle cx="112" cy="46" r="10" />
+        <path d="M64 54 H100" stroke="#e7a15a" />
+        <path d="M78 48 L86 54 L78 60" stroke="#e7a15a" />
+      </>
+    );
+  }
+  if (family === "drop" || family === "weigh") {
+    return (
+      <>
+        <path d="M28 20 V84" />
+        <circle className="bob" cx="28" cy="36" r="6" fill="#e7a15a" stroke="none" />
+        <path d="M70 28 V78" stroke="#8fd0ef" />
+        <path d="M64 72 H76" />
+      </>
+    );
+  }
+  if (family === "orbit" || family === "kepler" || family === "escape") {
+    return (
+      <>
+        <circle cx="78" cy="52" r="12" />
+        <ellipse cx="78" cy="52" rx="40" ry="16" />
+        <circle className="slide" cx="118" cy="52" r="4" fill="#e7a15a" stroke="none" />
+      </>
+    );
+  }
+  return (
+    <>
+      <circle cx="80" cy="54" r="16" />
+      <path d="M80 22 V38" stroke="#8fd0ef" />
+      <path d="M80 70 V86" stroke="#8fd0ef" />
+      <path d="M48 54 H64" stroke="#8fd0ef" />
+      <path d="M96 54 H112" stroke="#8fd0ef" />
+    </>
+  );
+}
+
+function matterArt(family: string): ReactNode {
+  if (family === "spring" || family === "rod" || family === "pair") {
+    return (
+      <>
+        <path d="M18 28 V72" />
+        <path className="spring" d="M32 50 q10 -18 20 0 t20 0 t20 0 t20 0" stroke="#e7a15a" />
+        <rect x="112" y="40" width="22" height="18" />
+      </>
+    );
+  }
+  if (family === "capillary" || family === "fall" || family === "life") {
+    return (
+      <>
+        <path d="M70 16 V84" />
+        <path d="M58 78 H82" />
+        <path d="M64 78 V42 Q70 34 76 42 V78" stroke="#8fd0ef" />
+        <circle className="bob" cx="70" cy="36" r="5" fill="#8fd0ef" stroke="none" />
+      </>
+    );
+  }
+  if (family === "flow" || family === "bern") {
+    return (
+      <>
+        <path d="M16 38 H58 C70 38 74 50 86 50 H146" stroke="#8fd0ef" />
+        <path d="M16 62 H58 C70 62 74 50 86 50 H146" stroke="#8fd0ef" />
+        <circle className="slide-short" cx="40" cy="50" r="4" fill="#e7a15a" stroke="none" />
+      </>
+    );
+  }
+  if (family === "graph" || family === "moduli") {
+    return (
+      <>
+        <path d="M28 16 V84 H146" />
+        <path d="M32 72 L58 40 L78 48 L120 24" stroke="#e7a15a" />
+      </>
+    );
+  }
+  return (
+    <>
+      <circle className="dot" cx="48" cy="58" r="8" fill="#8fd0ef" stroke="none" />
+      <circle className="dot delay-1" cx="78" cy="42" r="6" fill="#8fd0ef" stroke="none" />
+      <circle className="dot delay-2" cx="108" cy="62" r="7" fill="#9ad7ef" stroke="none" />
+    </>
+  );
+}
+
 export function CardMotion({ kind, name }: { kind: Kind; name: string }) {
   const clip = useId().replace(/:/g, "");
-  const picture = kind === "vector" ? vectorArt(name) : kind === "wave" ? waveArt(name, clip) : kind === "optics" ? opticsArt(name, clip) : kind === "energy" ? energyArt(name) : thermoArt(name);
+  const picture =
+    kind === "vector"
+      ? vectorArt(name)
+      : kind === "wave"
+        ? waveArt(name, clip)
+        : kind === "optics"
+          ? opticsArt(name, clip)
+          : kind === "energy"
+            ? energyArt(name)
+            : kind === "matter"
+              ? matterArt(name)
+              : kind === "gravity"
+                ? gravityArt(name)
+                : kind === "newton"
+                  ? newtonArt(name)
+                  : kind === "dynamics"
+                    ? dynamicsArt(name)
+                    : thermoArt(name);
 
   return (
     <svg viewBox="0 0 160 100" className="card-motion h-24 w-full" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">

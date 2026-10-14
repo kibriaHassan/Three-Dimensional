@@ -58,6 +58,10 @@ const ui = {
     waveChapter: "তরঙ্গ অধ্যায়",
     thermoChapter: "তাপগতিবিদ্যা অধ্যায়",
     energyChapter: "কাজ, শক্তি ও ক্ষমতা",
+    matterChapter: "পদার্থের গাঠনিক ধর্ম",
+    gravityChapter: "মহাকর্ষ ও অভিকর্ষ",
+    newtonChapter: "নিউটনীয় বলবিদ্যা",
+    dynamicsChapter: "গতিবিদ্যা",
   },
   en: {
     graph: "Graph",
@@ -112,6 +116,10 @@ const ui = {
     waveChapter: "Waves",
     thermoChapter: "Thermodynamics",
     energyChapter: "Work, energy and power",
+    matterChapter: "Properties of matter",
+    gravityChapter: "Gravitation",
+    newtonChapter: "Newtonian mechanics",
+    dynamicsChapter: "Kinematics",
   },
 } as const;
 

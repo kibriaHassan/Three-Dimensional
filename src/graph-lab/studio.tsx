@@ -1,10 +1,10 @@
 "use client";
 
 import Link from "next/link";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { BrandLockup } from "@/components/brand-mark";
 import { chapterEn, sscChapterEn, useLang } from "@/components/locale";
-import { SiteBar } from "@/components/site-bar";
+import { SiteBar, type Board } from "@/components/site-bar";
 import { interPapers } from "@/lib/inter-physics";
 import { sscGraphChapters } from "./ssc-chapters";
 import { toBn } from "@/vector-lab/math";
@@ -19,6 +19,14 @@ const filters: { id: "all" | GraphSource; label: string }[] = [
   { id: "schematic", label: "নকশা" },
 ];
 
+const paperOrder: Board[] = ["paper-1", "paper-2", "ssc"];
+
+function paperHome(id: Board) {
+  if (id === "paper-2") return interPapers[1].chapters[0].id;
+  if (id === "ssc") return sscGraphChapters[0].id;
+  return interPapers[0].chapters[0].id;
+}
+
 export function GraphStudio({ chapter }: { chapter: string }) {
   const { lang, t } = useLang();
   const [query, setQuery] = useState("");
@@ -29,11 +37,16 @@ export function GraphStudio({ chapter }: { chapter: string }) {
   const chapters = sscHit
     ? sscGraphChapters
     : (paper ?? interPapers[0]).chapters.map((item, index) => ({ id: item.id, no: index + 1, title: item.title, blurb: item.blurb }));
-  const paperShort = sscHit ? "SSC" : boardId === "paper-2" ? "HSC ২য়" : "HSC ১ম";
   const paperLong = sscHit ? "SSC" : boardId === "paper-2" ? "HSC ২য় পত্র" : "HSC ১ম পত্র";
   const current = chapters.find((item) => item.id === chapter);
   const labelOf = (id: string, title: string) => (lang === "en" ? chapterEn[id] ?? sscChapterEn[id] ?? title : title);
+  const paperLabel = { "paper-1": t("inter1"), "paper-2": t("inter2"), ssc: t("ssc") };
   const all = graphsFor(chapter);
+
+  useEffect(() => {
+    setQuery("");
+    setFilter("all");
+  }, [boardId]);
 
   const shown = useMemo(() => {
     const text = query.trim().toLowerCase();
@@ -55,10 +68,24 @@ export function GraphStudio({ chapter }: { chapter: string }) {
       <div className="mx-auto grid max-w-6xl gap-6 px-4 py-5 sm:px-5 lg:grid-cols-[15.5rem_minmax(0,1fr)] lg:py-8">
         <aside className="hidden lg:block">
           <div className="sticky top-20 max-h-[calc(100dvh-6rem)] overflow-y-auto rounded-[28px] bg-[#10161d] p-3 text-[#f6f1e6] shadow-[6px_6px_0_#c4623a]">
-            <p className="px-2 text-[11px] font-bold tracking-[0.16em] text-[#f0d48a]">{paperShort}</p>
-            <h2 className="px-2 font-serif text-2xl">{t("chapters")}</h2>
+            <nav className="grid gap-1.5" aria-label={t("graph")}>
+              {paperOrder.map((id) => {
+                const on = id === boardId;
+                return (
+                  <Link
+                    key={id}
+                    href={`/graph/${on ? chapter : paperHome(id)}`}
+                    aria-current={on ? "page" : undefined}
+                    className={`rounded-2xl px-3 py-2 text-center text-sm font-bold no-underline ${on ? "bg-[#f6f1e6] text-ink shadow-[3px_3px_0_#c4623a]" : "text-[#f6f1e6] hover:bg-white/10"}`}
+                  >
+                    {paperLabel[id]}
+                  </Link>
+                );
+              })}
+            </nav>
+            <h2 className="mt-4 px-2 font-serif text-2xl">{t("chapters")}</h2>
             <ul className="mt-2 grid gap-1">
-              {chapters.map((item, index) => {
+              {chapters.map((item) => {
                 const on = item.id === chapter;
                 const label = labelOf(item.id, item.title);
                 return (
@@ -78,6 +105,21 @@ export function GraphStudio({ chapter }: { chapter: string }) {
           </div>
         </aside>
         <main className="min-w-0">
+          <nav className="mb-3 grid grid-cols-3 gap-1.5 lg:hidden" aria-label={t("graph")}>
+            {paperOrder.map((id) => {
+              const on = id === boardId;
+              return (
+                <Link
+                  key={id}
+                  href={`/graph/${on ? chapter : paperHome(id)}`}
+                  aria-current={on ? "page" : undefined}
+                  className={`rounded-full px-2 py-2 text-center text-xs font-bold no-underline ${on ? "bg-ink text-paper-2 shadow-[3px_3px_0_#c4623a]" : "border border-line bg-white text-ink"}`}
+                >
+                  {paperLabel[id]}
+                </Link>
+              );
+            })}
+          </nav>
           <nav className="mb-4 flex gap-2 overflow-x-auto pb-1 lg:hidden">
             {chapters.map((item) => {
               const on = item.id === chapter;

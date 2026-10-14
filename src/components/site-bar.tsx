@@ -18,8 +18,21 @@ export function SiteBar({ active, onSelect }: { active?: Board; onSelect?: (boar
   const path = usePathname() ?? "";
   const label = { "paper-1": t("inter1"), "paper-2": t("inter2"), ssc: t("ssc") };
   const [open, setOpen] = useState(false);
-  const [picked, setPicked] = useState<string | null>(null);
   const [mounted, setMounted] = useState(false);
+  const pathBoard: Board | null = path.startsWith("/graph/")
+    ? sscGraphChapters.some((item) => path === `/graph/${item.id}`)
+      ? "ssc"
+      : interPapers[1].chapters.some((item) => path === `/graph/${item.id}`)
+        ? "paper-2"
+        : interPapers[0].chapters.some((item) => path === `/graph/${item.id}`)
+          ? "paper-1"
+          : null
+    : null;
+  const [shown, setShown] = useState<Board>(pathBoard ?? active ?? "paper-1");
+
+  useEffect(() => {
+    setShown(pathBoard ?? active ?? "paper-1");
+  }, [pathBoard, active]);
 
   useEffect(() => {
     setOpen(false);
@@ -98,30 +111,37 @@ export function SiteBar({ active, onSelect }: { active?: Board; onSelect?: (boar
           </button>
         </div>
         <div className="drawer-scroll min-h-0 flex-1 overflow-y-auto px-3 py-4">
-          {groups.map((group) => (
-            <section key={group.id} className="mb-5">
+          <div className="sticky top-0 z-10 grid grid-cols-3 gap-1.5 bg-[#10161d] pb-3">
+            {boards.map((board) => {
+              const on = shown === board;
+              return (
+                <button
+                  key={board}
+                  type="button"
+                  aria-pressed={on}
+                  onClick={() => setShown(board)}
+                  className={`rounded-2xl px-2 py-2 text-center text-xs font-bold ${on ? "bg-[#f6f1e6] text-ink shadow-[3px_3px_0_#c4623a]" : "text-[#f6f1e6] hover:bg-white/10"}`}
+                >
+                  {label[board]}
+                </button>
+              );
+            })}
+          </div>
+          {groups
+            .filter((group) => group.id === shown)
+            .map((group) => (
+            <section key={group.id}>
               <h3 className="px-2 text-[11px] font-bold tracking-[0.14em] text-[#f0d48a]">{group.title}</h3>
               <ul className="mt-2 grid gap-1">
                 {group.items.map((item, index) => {
-                  const key = `${group.id}:${item.id}`;
-                  const linked = group.id === "paper-1" || group.id === "paper-2" || group.id === "ssc";
-                  const current = linked && path === `/graph/${item.id}`;
-                  const on = current || picked === key;
-                  const row = `grid w-full grid-cols-[2.2rem_minmax(0,1fr)] items-center gap-1 rounded-2xl px-2 py-2 text-left text-sm font-semibold ${on ? "bg-[#f6f1e6] text-ink" : "text-[#f6f1e6] hover:bg-white/8"}`;
-                  const mark = <span className={`font-serif ${on ? "text-copper-deep" : "text-[#f0d48a]"}`}>{toBn(item.no ?? index + 1)}</span>;
+                  const current = path === `/graph/${item.id}`;
+                  const row = `grid w-full grid-cols-[2.2rem_minmax(0,1fr)] items-center gap-1 rounded-2xl px-2 py-2 text-left text-sm font-semibold no-underline ${current ? "bg-[#f6f1e6] text-ink" : "text-[#f6f1e6] hover:bg-white/8"}`;
                   return (
-                    <li key={key}>
-                      {linked ? (
-                        <Link href={`/graph/${item.id}`} aria-current={current ? "page" : undefined} onClick={() => setOpen(false)} className={`${row} no-underline`}>
-                          {mark}
-                          <span>{item.label}</span>
-                        </Link>
-                      ) : (
-                        <button type="button" aria-pressed={on} onClick={() => setPicked(key)} className={row}>
-                          {mark}
-                          <span>{item.label}</span>
-                        </button>
-                      )}
+                    <li key={item.id}>
+                      <Link href={`/graph/${item.id}`} aria-current={current ? "page" : undefined} onClick={() => setOpen(false)} className={row}>
+                        <span className={`font-serif ${current ? "text-copper-deep" : "text-[#f0d48a]"}`}>{toBn(item.no ?? index + 1)}</span>
+                        <span>{item.label}</span>
+                      </Link>
                     </li>
                   );
                 })}
