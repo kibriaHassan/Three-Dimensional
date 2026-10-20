@@ -22,6 +22,14 @@ export type Knob = {
 
 export type GraphSource = "book" | "extra" | "schematic";
 
+export type ConcavePlace = "infinity" | "beyond" | "center" | "between" | "focus" | "inside";
+
+export type RayVerdict = {
+  position: string;
+  shape: string;
+  nature: string;
+};
+
 export type GraphView = {
   curves: Curve[];
   guides?: Guide[];
@@ -58,4 +66,6 @@ export type GraphSpec = {
   knobs: Knob[];
   base: Record<string, number>;
   build: (p: Record<string, number>, time: number) => GraphView;
+  ray?: ConcavePlace;
+  verdict?: RayVerdict;
 };

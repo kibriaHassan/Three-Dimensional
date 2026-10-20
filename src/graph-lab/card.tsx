@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { toBn } from "@/vector-lab/math";
 import { derivations, type DeriveStep } from "./derive";
 import { bnNum } from "./format";
+import { ConcaveRay } from "./mirror-ray";
 import { GraphPlot } from "./plot";
 import type { Curve, GraphSpec, Probe } from "./types";
 
@@ -13,10 +14,10 @@ const sourceLabel = {
   schematic: "পাঠ্যবইয়ের নকশা",
 } as const;
 
-function DerivePath({ steps }: { steps: DeriveStep[] }) {
+function DerivePath({ steps, title = "মূল সূত্র থেকে এই লেখ" }: { steps: DeriveStep[]; title?: string }) {
   return (
     <div className="derive-path rounded-[22px] border border-[#1c2a24] bg-[#fbf7ef] px-3 py-3">
-      <p className="text-[11px] font-bold tracking-[0.14em] text-copper-deep">মূল সূত্র থেকে এই লেখ</p>
+      <p className="text-[11px] font-bold tracking-[0.14em] text-copper-deep">{title}</p>
       <ol className="mt-3">
         {steps.map((step, index) => {
           const last = index === steps.length - 1;
@@ -106,9 +107,11 @@ export function GraphCard({ spec, index }: { spec: GraphSpec; index: number }) {
       </header>
       <div className="grid gap-4 p-3 sm:p-4 lg:grid-cols-[minmax(0,24rem)_minmax(0,1fr)] lg:items-start">
         <div className="min-w-0">
+          {spec.ray ? null : (
           <p className="mb-1 text-center text-xs font-bold">
             {spec.yName} <span className="font-semibold text-muted">({spec.ySymbol})</span>
           </p>
+          )}
           {curves.some((item) => item.name) ? (
             <ul className="mb-2 flex flex-wrap justify-center gap-x-3 gap-y-1 text-[11px] font-bold text-muted">
               {curves.map((item) => (
@@ -119,7 +122,8 @@ export function GraphCard({ spec, index }: { spec: GraphSpec; index: number }) {
               ))}
             </ul>
           ) : null}
-          <div className="rounded-[20px] border-2 border-[#10161d] bg-[#fbfaf6]">
+          <div className="rounded-[20px] border-2 border-[#10161d] bg-[#fbfaf6] p-1">
+            {spec.ray ? <ConcaveRay place={spec.ray} /> : (
             <GraphPlot
               curves={curves}
               guides={live.guides}
@@ -132,10 +136,13 @@ export function GraphCard({ spec, index }: { spec: GraphSpec; index: number }) {
               marker={pick}
               onPick={setPick}
             />
+            )}
           </div>
+          {spec.ray ? null : (
           <p className="mt-1 text-center text-xs font-bold">
             {spec.xName} <span className="font-semibold text-muted">({spec.xSymbol})</span>
           </p>
+          )}
           {spec.knobs.length > 0 ? (
             <div className="mt-3 grid gap-3">
               {spec.knobs.map((item) => {
@@ -166,6 +173,7 @@ export function GraphCard({ spec, index }: { spec: GraphSpec; index: number }) {
               })}
             </div>
           ) : null}
+          {spec.ray ? null : (
           <div className="mt-3 flex flex-wrap gap-2">
             <button type="button" onClick={reset} className="rounded-full border border-ink bg-white px-3 py-1.5 text-sm font-bold">
               রিসেট
@@ -186,12 +194,29 @@ export function GraphCard({ spec, index }: { spec: GraphSpec; index: number }) {
               </button>
             ) : null}
           </div>
+          )}
         </div>
         <div className="grid content-start gap-2">
-        {steps ? <DerivePath steps={steps} /> : null}
+        {spec.verdict ? (
+          <div className="grid gap-2 text-sm leading-relaxed">
+            <p className="rounded-2xl border border-line px-3 py-2">{spec.explain}</p>
+            <dl className="rounded-2xl bg-[#10161d] px-3 py-2 text-[#f6f1e6]">
+              <div className="grid grid-cols-[auto_1fr] gap-x-3 gap-y-1">
+                <dt className="font-bold text-[#f0d48a]">অবস্থান</dt>
+                <dd>{spec.verdict.position}</dd>
+                <dt className="font-bold text-[#f0d48a]">আকৃতি</dt>
+                <dd>{spec.verdict.shape}</dd>
+                <dt className="font-bold text-[#f0d48a]">প্রকৃতি</dt>
+                <dd>{spec.verdict.nature}</dd>
+              </div>
+            </dl>
+          </div>
+        ) : null}
+        {steps && !spec.verdict ? <DerivePath steps={steps} /> : null}
+        {spec.verdict ? null : (
         <dl className="grid content-start gap-2 text-sm leading-relaxed">
           <div className="rounded-2xl bg-[#10161d] px-3 py-2 text-[#f6f1e6]">
-            <dt className="text-[11px] font-bold tracking-wide text-[#f0d48a]">হিসাব</dt>
+            <dt className="text-[11px] font-bold tracking-wide text-[#f0d48a]">{spec.ray ? "ফলাফল" : "হিসাব"}</dt>
             <dd className="mt-0.5">{live.calc}</dd>
           </div>
           <div className="rounded-2xl bg-paper px-3 py-2">
@@ -202,6 +227,7 @@ export function GraphCard({ spec, index }: { spec: GraphSpec; index: number }) {
             <dt className="text-[11px] font-bold tracking-wide text-muted">ব্যাখ্যা</dt>
             <dd>{spec.explain}</dd>
           </div>
+          {spec.ray ? null : (
           <div className="grid gap-2 sm:grid-cols-2">
             <div className="rounded-2xl border border-line px-3 py-2">
               <dt className="text-[11px] font-bold tracking-wide text-muted">ঢাল</dt>
@@ -212,11 +238,13 @@ export function GraphCard({ spec, index }: { spec: GraphSpec; index: number }) {
               <dd>{spec.area}</dd>
             </div>
           </div>
+          )}
           <div className="rounded-2xl border border-line px-3 py-2">
             <dt className="text-[11px] font-bold tracking-wide text-muted">বৈজ্ঞানিক তাৎপর্য</dt>
             <dd>{spec.meaning}</dd>
           </div>
         </dl>
+        )}
         </div>
       </div>
     </section>

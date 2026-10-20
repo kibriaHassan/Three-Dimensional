@@ -16,7 +16,7 @@ function setSeg(line, a, b) {
 export const lightScenes = [
   {
     id: "reflection",
-    chapter: "light",
+    chapter: "reflect",
     chapterNo: "৮",
     chapterName: "আলোর প্রতিফলন",
     title: "প্রতিফলনের সূত্র",

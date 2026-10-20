@@ -15,7 +15,8 @@ export const chapters = [
   { id: "matter", name: "চাপ" },
   { id: "heat", name: "তাপ" },
   { id: "wave", name: "তরঙ্গ" },
-  { id: "light", name: "আলো" },
+  { id: "reflect", name: "৮ আলোর প্রতিফলন" },
+  { id: "light", name: "৯ আলোর প্রতিসরণ" },
   { id: "electro", name: "বিদ্যুৎ" },
   { id: "modern", name: "তেজস্ক্রিয়তা" },
 ];

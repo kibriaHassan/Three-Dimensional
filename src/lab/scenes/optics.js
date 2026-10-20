@@ -80,7 +80,11 @@ function indexForU(u) {
   return best;
 }
 
-function pose(t) {
+function pose(t, hold) {
+  if (hold != null) {
+    const objectInfinity = PATH[hold] == null;
+    return { index: hold, objectInfinity, u: objectInfinity ? -3.35 : PATH[hold] };
+  }
   const span = PATH.length * SLOT;
   const clock = ((t % span) + span) % span;
   const index = Math.min(PATH.length - 1, Math.floor(clock / SLOT));
@@ -135,7 +139,7 @@ function makeOptics(spec) {
   const { f, kind } = spec;
   return {
     id: spec.id,
-    chapter: "light",
+    chapter: spec.chapter || "light",
     chapterNo: spec.chapterNo,
     chapterName: spec.chapterName,
     title: spec.title,
@@ -145,7 +149,7 @@ function makeOptics(spec) {
     verbal: spec.verbal,
     proof: spec.proof,
     note: spec.note,
-    duration: PATH.length * SLOT,
+    duration: spec.hold == null ? PATH.length * SLOT : 16,
     spin: false,
     steps: spec.steps,
     create(ctx) {
@@ -222,7 +226,7 @@ function makeOptics(spec) {
       const extB = ray(PAPER, true);
 
       const objectArrow = ctx.arrow(C.force);
-      ctx.place(objectArrow, { min: -3.35, max: -0.42, reach: 0.72 });
+      if (spec.hold == null) ctx.place(objectArrow, { min: -3.35, max: -0.42, reach: 0.72 });
       const imageArrow = ctx.arrow(C.velocity);
       const objectTag = tag("বস্তু", 0, 0, Z);
       const imageTag = tag("বিম্ব", 0, 0, Z);
@@ -390,13 +394,14 @@ function makeOptics(spec) {
 
       return {
         update(t) {
-          const scripted = pose(t);
-          const live = ctx.hand.active && Number.isFinite(ctx.hand.u);
+          const scripted = pose(t, spec.hold);
+          const live = spec.hold == null && ctx.hand.active && Number.isFinite(ctx.hand.u);
           const place = live
             ? { index: indexForU(ctx.hand.u), objectInfinity: false, u: ctx.hand.u }
             : scripted;
           const img = place.objectInfinity ? { mode: "object-infinity" } : solve(place.u, f, kind);
-          banner.set(`${spec.steps[place.index].title}\n${describe(img, f, kind)}`);
+          const heading = spec.caption || spec.steps[place.index].title;
+          banner.set(`${heading}\n${describe(img, f, kind)}`);
           if (place.objectInfinity) {
             objectArrow.visible = false;
             objectTag.visible = false;
@@ -419,7 +424,124 @@ function makeOptics(spec) {
   };
 }
 
-const mirrorNote = "লাল তীর বস্তু। সবুজ তীর বাস্তব বিম্ব, হলুদ তীর অবাস্তব বিম্ব। সাদা ড্যাশ সেই দিক, যেদিকে আলো আসলে যায় না — বিম্ব সেখানে মনে হয়। P মেরু, F ফোকাস, C বক্রতার কেন্দ্র।";
+const mirrorNote = "লাল তীর বস্তু। সবুজ তীর বাস্তব বিম্ব, হলুদ তীর অবাস্তব বিম্ব। সাদা ড্যাশ সেই দিক, যেদিকে আলো আসলে যায় না — বিম্ব সেখানে মনে হয়। P মেরু, F ফোকাস, C বক্রতার কেন্দ্র। চিত্র বাঁয়ে, আঁকার ধাপ ডানে।";
+
+function concaveCases() {
+  const shared = {
+    chapter: "reflect",
+    chapterNo: "৮",
+    chapterName: "আলোর প্রতিফলন",
+    formula: "1/v + 1/u = 1/f",
+    note: mirrorNote,
+    f: -1,
+    kind: "mirror",
+  };
+  const rows = [
+    {
+      id: "mirror-c-far",
+      hold: 0,
+      caption: "লক্ষ্যবস্তু অসীমে",
+      title: "অসীম দূরের বস্তু",
+      blurb: "সমান্তরাল রশ্মি ফোকাসে মিলে। বিম্ব F-এ, অতি খর্ব।",
+      verbal: "অসীম থেকে আসা রশ্মি ফোকাস দিয়ে যায়। বিম্ব বাস্তব, উল্টো, অতি খর্ব।",
+      proof: "প্রতিবিম্ব ফোকাস F-এ একটি বিন্দু। এটি বাস্তব, উল্টো ও অতি খর্ব।",
+      keywords: "অবতল দর্পণ অসীম ফোকাস অতি খর্ব রশ্মিচিত্র",
+      steps: [
+        { t: 0, title: "অক্ষ ও বিন্দু", body: "প্রধান অক্ষ XX′ আঁকি। দর্পণের মেরু P, ফোকাস F ও বক্রতার কেন্দ্র C চিহ্নিত করি।" },
+        { t: 3, title: "লক্ষ্যবস্তু", body: "লক্ষ্যবস্তু অসীম দূরে। সেখান থেকে আসা আলো প্রধান অক্ষের সমান্তরাল রশ্মির মতো দর্পণে পড়ে।" },
+        { t: 6, title: "প্রতিফলন", body: "প্রধান অক্ষের সমান্তরাল রশ্মি প্রতিফলনের পর ফোকাস F দিয়ে যায়। একাধিক সমান্তরাল রশ্মিও সেই এক F-এ মিলিত হয়।" },
+        { t: 9, title: "প্রতিবিম্ব", body: "সব রশ্মি F-এ মেশায়, তাই প্রতিবিম্ব ফোকাসে একটি বিন্দু। A′B′ আলাদা লম্বা তীর হয় না।" },
+        { t: 12, title: "প্রকৃতি ও আকৃতি", body: "প্রতিবিম্ব বাস্তব ও উল্টো। বস্তু অসীমে থাকায় এটি অতি খর্ব।" },
+      ],
+    },
+    {
+      id: "mirror-c-beyond",
+      hold: 1,
+      caption: "লক্ষ্যবস্তু C-এর বাইরে",
+      title: "বক্রতার কেন্দ্রের বাইরে",
+      blurb: "AB কেন্দ্রের বাইরে। প্রতিবিম্ব F ও C-এর মাঝে, খর্বিত।",
+      verbal: "সমান্তরাল রশ্মি F দিয়ে ফেরে। C দিয়ে যাওয়া রশ্মি নিজ পথে ফেরে। ছেদ F ও C-এর মাঝে।",
+      proof: "A′B′ বাস্তব, উল্টো ও খর্বিত। প্রতিবিম্ব ফোকাস F ও বক্রতার কেন্দ্র C-এর মাঝে গঠিত হয়।",
+      keywords: "অবতল দর্পণ কেন্দ্রের বাইরে খর্বিত বাস্তব উল্টো রশ্মিচিত্র",
+      steps: [
+        { t: 0, title: "অক্ষ ও বিন্দু", body: "প্রধান অক্ষ XX′ আঁকি। মেরু P, ফোকাস F ও বক্রতার কেন্দ্র C চিহ্নিত করি।" },
+        { t: 3, title: "লক্ষ্যবস্তু", body: "লক্ষ্যবস্তু AB-কে C-এর বাইরে, প্রধান অক্ষের উপর লম্ব করে খাড়া আঁকি।" },
+        { t: 6, title: "প্রথম রশ্মি", body: "B থেকে প্রধান অক্ষের সমান্তরাল একটি রশ্মি দর্পণে আপতিত হয় এবং প্রতিফলনের পর F দিয়ে যায়।" },
+        { t: 9, title: "দ্বিতীয় রশ্মি", body: "B থেকে C-এর ভিতর দিয়ে যাওয়া রশ্মি দর্পণে লম্বভাবে পড়ে, তাই নিজের পথেই ফিরে আসে।" },
+        { t: 12, title: "প্রতিবিম্ব", body: "দুই প্রতিফলিত রশ্মির ছেদবিন্দু B′। B′ থেকে প্রধান অক্ষের উপর লম্ব A′B′ আঁকি। A′B′ই প্রতিবিম্ব। এটি বাস্তব, উল্টো ও খর্বিত, এবং F ও C-এর মাঝে।" },
+      ],
+    },
+    {
+      id: "mirror-c-center",
+      hold: 2,
+      caption: "লক্ষ্যবস্তু C-এর উপর",
+      title: "বক্রতার কেন্দ্রের উপর",
+      blurb: "AB কেন্দ্রে। প্রতিবিম্বও C-তে, বস্তুর সমান।",
+      verbal: "দুই রশ্মির ছেদ C-তেই। প্রতিবিম্ব বাস্তব, উল্টো, বস্তুর সমান।",
+      proof: "A′B′ বাস্তব, উল্টো ও লক্ষ্যবস্তুর সমান। প্রতিবিম্ব বক্রতার কেন্দ্র C-এর উপর গঠিত হয়।",
+      keywords: "অবতল দর্পণ কেন্দ্রের উপর সমান বিম্ব রশ্মিচিত্র",
+      steps: [
+        { t: 0, title: "অক্ষ ও বিন্দু", body: "প্রধান অক্ষ XX′ আঁকি। মেরু P, ফোকাস F ও বক্রতার কেন্দ্র C চিহ্নিত করি।" },
+        { t: 3, title: "লক্ষ্যবস্তু", body: "লক্ষ্যবস্তু AB-কে C-এর ঠিক উপর, প্রধান অক্ষের উপর লম্ব করে খাড়া আঁকি।" },
+        { t: 6, title: "প্রথম রশ্মি", body: "B থেকে প্রধান অক্ষের সমান্তরাল রশ্মি দর্পণে পড়ে এবং F দিয়ে প্রতিফলিত হয়।" },
+        { t: 9, title: "দ্বিতীয় রশ্মি", body: "B থেকে C-এর ভিতর দিয়ে যাওয়া রশ্মি দর্পণে লম্বভাবে পড়ে। সেটি নিজের পথেই ফিরে আসে।" },
+        { t: 12, title: "প্রতিবিম্ব", body: "দুই প্রতিফলিত রশ্মি C-তে মেশে। সেই ছেদ থেকে অক্ষের উপর লম্ব A′B′ আঁকি। A′B′ বাস্তব, উল্টো ও AB-এর সমান, এবং C-এর উপরই থাকে।" },
+      ],
+    },
+    {
+      id: "mirror-c-between",
+      hold: 3,
+      caption: "লক্ষ্যবস্তু F ও C-এর মাঝে",
+      title: "ফোকাস ও কেন্দ্রের মাঝে",
+      blurb: "AB ফোকাস ও কেন্দ্রের মাঝে। প্রতিবিম্ব C-এর বাইরে, বিবর্ধিত।",
+      verbal: "ছেদ C-এর বাইরে। প্রতিবিম্ব বাস্তব, উল্টো, বিবর্ধিত।",
+      proof: "A′B′ বাস্তব, উল্টো ও বিবর্ধিত। প্রতিবিম্ব বক্রতার কেন্দ্র C-এর বাইরে গঠিত হয়।",
+      keywords: "অবতল দর্পণ ফোকাস কেন্দ্রের মাঝে বিবর্ধিত রশ্মিচিত্র",
+      steps: [
+        { t: 0, title: "অক্ষ ও বিন্দু", body: "প্রধান অক্ষ XX′ আঁকি। মেরু P, ফোকাস F ও বক্রতার কেন্দ্র C চিহ্নিত করি।" },
+        { t: 3, title: "লক্ষ্যবস্তু", body: "লক্ষ্যবস্তু AB-কে F ও C-এর মাঝে, প্রধান অক্ষের উপর লম্ব করে খাড়া আঁকি।" },
+        { t: 6, title: "প্রথম রশ্মি", body: "B থেকে প্রধান অক্ষের সমান্তরাল রশ্মি দর্পণে পড়ে এবং প্রতিফলনের পর F দিয়ে যায়।" },
+        { t: 9, title: "দ্বিতীয় রশ্মি", body: "B থেকে C-এর দিকে টানা রশ্মি দর্পণে লম্বভাবে পড়ে, তাই নিজের পথেই ফিরে আসে।" },
+        { t: 12, title: "প্রতিবিম্ব", body: "দুই প্রতিফলিত রশ্মির ছেদ C-এর বাইরে। সেই বিন্দু থেকে অক্ষের উপর লম্ব A′B′ আঁকি। A′B′ বাস্তব, উল্টো ও বিবর্ধিত।" },
+      ],
+    },
+    {
+      id: "mirror-c-focus",
+      hold: 4,
+      caption: "লক্ষ্যবস্তু F-এর উপর",
+      title: "ফোকাসের উপর",
+      blurb: "AB ফোকাসে। প্রতিফলিত রশ্মি সমান্তরাল। বিম্ব অসীমে।",
+      verbal: "F দিয়ে আসা রশ্মি প্রতিফলনের পর অক্ষের সমান্তরাল। বিম্ব অসীমে, অতি বিবর্ধিত।",
+      proof: "দুই প্রতিফলিত রশ্মি পরস্পর সমান্তরাল, তাই সামনে মেশে না। প্রতিবিম্ব অসীমে — বাস্তব, উল্টো ও অতি বিবর্ধিত।",
+      keywords: "অবতল দর্পণ ফোকাস অসীম অতি বিবর্ধিত রশ্মিচিত্র",
+      steps: [
+        { t: 0, title: "অক্ষ ও বিন্দু", body: "প্রধান অক্ষ XX′ আঁকি। মেরু P, ফোকাস F ও বক্রতার কেন্দ্র C চিহ্নিত করি।" },
+        { t: 3, title: "লক্ষ্যবস্তু", body: "লক্ষ্যবস্তু AB-কে ফোকাস F-এর ঠিক উপর, প্রধান অক্ষের উপর লম্ব করে খাড়া আঁকি।" },
+        { t: 6, title: "প্রথম রশ্মি", body: "B থেকে প্রধান অক্ষের সমান্তরাল রশ্মি দর্পণে পড়ে এবং F দিয়ে প্রতিফলিত হয়।" },
+        { t: 9, title: "দ্বিতীয় রশ্মি", body: "B থেকে ফোকাস F-এর ভিতর দিয়ে আসা রশ্মি প্রতিফলনের পর প্রধান অক্ষের সমান্তরাল হয়ে যায়।" },
+        { t: 12, title: "প্রতিবিম্ব", body: "দুই প্রতিফলিত রশ্মি পরস্পর সমান্তরাল, তাই কোনো ছেদবিন্দু নেই। প্রতিবিম্ব অসীমে। এটি বাস্তব, উল্টো ও অতি বিবর্ধিত।" },
+      ],
+    },
+    {
+      id: "mirror-c-near",
+      hold: 5,
+      caption: "লক্ষ্যবস্তু P ও F-এর মাঝে",
+      title: "ফোকাস ও মেরুর মাঝে",
+      blurb: "AB ফোকাসের ভিতরে। প্রতিবিম্ব দর্পণের পেছনে, সোজা ও বিবর্ধিত।",
+      verbal: "সামনে রশ্মি মেলে না। পেছনে বাড়ালে মেলে। বিম্ব অবাস্তব, সোজা, বিবর্ধিত।",
+      proof: "A′B′ দর্পণের পেছনে। প্রতিবিম্ব অবাস্তব, সোজা ও বিবর্ধিত।",
+      keywords: "অবতল দর্পণ ফোকাসের ভিতরে অবাস্তব সোজা বিবর্ধিত রশ্মিচিত্র",
+      steps: [
+        { t: 0, title: "অক্ষ ও বিন্দু", body: "প্রধান অক্ষ XX′ আঁকি। মেরু P, ফোকাস F ও বক্রতার কেন্দ্র C চিহ্নিত করি।" },
+        { t: 3, title: "লক্ষ্যবস্তু", body: "লক্ষ্যবস্তু AB-কে মেরু P ও ফোকাস F-এর মাঝে, প্রধান অক্ষের উপর লম্ব করে খাড়া আঁকি।" },
+        { t: 6, title: "প্রথম রশ্মি", body: "B থেকে প্রধান অক্ষের সমান্তরাল রশ্মি দর্পণে পড়ে এবং F দিয়ে প্রতিফলিত হয়।" },
+        { t: 9, title: "দ্বিতীয় রশ্মি", body: "B থেকে C-এর দিকে যাওয়া রশ্মি দর্পণে লম্বভাবে পড়ে এবং নিজের পথে ফিরে আসে।" },
+        { t: 12, title: "প্রতিবিম্ব", body: "দুই প্রতিফলিত রশ্মি দর্পণের সামনে মেলে না। পেছন দিকে বাড়ালে মেলে। সেই ছেদ থেকে অক্ষের উপর লম্ব A′B′ আঁকি। A′B′ দর্পণের পেছনে — অবাস্তব, সোজা ও বিবর্ধিত।" },
+      ],
+    },
+  ];
+  return rows.map((row) => makeOptics({ ...shared, ...row }));
+}
 const lensNote = "লাল তীর বস্তু। সবুজ তীর বাস্তব বিম্ব, হলুদ তীর অবাস্তব বিম্ব। সাদা ড্যাশ অবাস্তব বিম্বের দিকে। O আলোককেন্দ্র, F ও F′ দুই ফোকাস, ২F মানে ফোকাসের দ্বিগুণ দূরত্ব।";
 
 const concaveMirrorSteps = [
@@ -610,8 +732,10 @@ function tirScene() {
 }
 
 export const opticsScenes = [
+  ...concaveCases(),
   makeOptics({
     id: "mirror-concave",
+    chapter: "reflect",
     chapterNo: "৮",
     chapterName: "আলোর প্রতিফলন",
     title: "অবতল দর্পণে বিম্ব",
@@ -627,6 +751,7 @@ export const opticsScenes = [
   }),
   makeOptics({
     id: "mirror-convex",
+    chapter: "reflect",
     chapterNo: "৮",
     chapterName: "আলোর প্রতিফলন",
     title: "উত্তল দর্পণে বিম্ব",
